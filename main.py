@@ -47,9 +47,10 @@ class ANNarchyProfilerWindow(QMainWindow):
         diag = ANNarchyRunDialog()
         script, path, args = diag.get_data()
         
-        os.system("cd " + str(path))
-        os.system("python " + str(script) + " --profile --profile_out=" + str(path) + "measurement.xml " + str(args))
-        self.ui.AnalyzerWidget.set_data(str(path) + "measurement.xml")
+        if(script != ""):
+            os.system("cd " + str(path))
+            os.system("python " + str(script) + " --profile --profile_out=" + str(path) + "/measurement.xml " + str(args))
+            self.ui.AnalyzerWidget.set_data(str(path) + "/measurement.xml")
     
     @pyqtSlot()
     def save_chart(self):
@@ -87,13 +88,20 @@ class ANNarchyRunDialog(QDialog):
         
     def get_data(self):
         self.ui.exec_()
-        return self.ui.txtScript.text(), self.ui.txtPath.text(), self.ui.txtArgs.text()
+        if(self.result() == self.Accepted):
+            return self.ui.txtScript.text(), self.ui.txtPath.text(), self.ui.txtArgs.text()
+        else:
+            return '', '', ''
     
     def select_path(self):
         self.ui.txtPath.setText(QFileDialog.getExistingDirectory(self, 'Select working directory', '.'))
         
     def select_script(self):
-        self.ui.txtScript.setText(QFileDialog.getOpenFileName(self, 'Select script file', '.', '*.py'))
+        if(self.ui.txtPath.text() != ""):
+            path = self.ui.txtPath.text()
+        else:
+            path = "."
+        self.ui.txtScript.setText(QFileDialog.getOpenFileName(self, 'Select script file', path, '*.py'))
 
 if __name__ == '__main__': 
     app = QApplication(sys.argv)
