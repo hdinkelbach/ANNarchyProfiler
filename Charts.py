@@ -120,8 +120,8 @@ class ErrorbarChartWidget(MatplotlibWidget):
 
         ax.errorbar(x, y, yerr=std_values, fmt='-o')
         #ax.set_title('variable, symmetric error')
-        ax.set_xlabel("test nr.")
-        ax.set_ylabel("mean value")
+        ax.set_xlabel("test nr.", fontsize=18)
+        ax.set_ylabel("mean value", fontsize=18)
         ax.set_xticks(np.arange(min(x), max(x)+1, 5.0))
         ax.grid(True)
 
