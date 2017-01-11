@@ -1,8 +1,8 @@
 #==============================================================================
 #
-#     CodeGenerator.py
+#     Analyzer.py
 #
-#     This file is part of ANNarchy.
+#     This file is part of ANNarchyProfiler.
 #
 #     Copyright (C) 2016-2019  Toni Freitag <tfreitag93@gmail.com>,
 #     Helge Uelo Dinkelbach <helge.dinkelbach@gmail.com>
@@ -12,7 +12,7 @@
 #     the Free Software Foundation, either version 3 of the License, or
 #     (at your option) any later version.
 #
-#     ANNarchy is distributed in the hope that it will be useful,
+#     ANNarchyProfiler is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #     GNU General Public License for more details.
@@ -90,7 +90,7 @@ class PieChartTree(QtGui.QTreeWidget):
         Save data-container and fill TreeWidget.
         
         Signals
-            * setPieChartTree(PyQt_PyObject) emited from Analyzer.load_data()
+            * setPieChartTree(PyQt_PyObject) emitted from Analyzer.load_data()
         """
         self._data = data
         
@@ -102,6 +102,7 @@ class PieChartTree(QtGui.QTreeWidget):
             item.addChild(QtGui.QTreeWidgetItem(["proj - psp"]))
             l.append(item)
         
+        self.clear()
         self.addTopLevelItems(l)
     
     @QtCore.pyqtSlot(QtGui.QTreeWidgetItem,QtGui.QTreeWidgetItem)    
@@ -203,7 +204,8 @@ class ErrorbarChartTree(QtGui.QTreeWidget):
         l = []
         for name in names:
             l.append(QtGui.QTreeWidgetItem([name]))
-            
+        
+        self.clear()
         self.addTopLevelItems(l)
         
     @QtCore.pyqtSlot(QtGui.QTreeWidgetItem,QtGui.QTreeWidgetItem)    
