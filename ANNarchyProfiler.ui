@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ANNarchyProfilerWindow</class>
+ <widget class="QMainWindow" name="ANNarchyProfilerWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>787</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ANNarchy Profiler</string>
+  </property>
+  <widget class="QWidget" name="CentralWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="Analyzer" name="AnalyzerWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="deviation_chart">
+       <attribute name="title">
+        <string>Standardabweichung</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="errorbar_chart_layout">
+        <item>
+         <widget class="ErrorbarChartTree" name="ErrorbarChartTree">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+            <horstretch>100</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <attribute name="headerVisible">
+           <bool>false</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string notr="true">1</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item>
+         <widget class="ErrorbarChartWidget" name="ErrorbarChart" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="PieChartTab">
+       <attribute name="title">
+        <string>Torten</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="pie_chart_layout">
+        <item>
+         <widget class="PieChartTree" name="PieChartTree">
+          <attribute name="headerVisible">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="headerStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string notr="true">1</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignHCenter">
+         <widget class="PieChartWidget" name="PieChart" native="true"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>787</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuStart">
+    <property name="title">
+     <string>Start</string>
+    </property>
+    <addaction name="btnLoadData"/>
+    <addaction name="btnRunMeasurement"/>
+   </widget>
+   <addaction name="menuStart"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="btnLoadData">
+   <property name="text">
+    <string>Load data</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="btnRunMeasurement">
+   <property name="text">
+    <string>Run measurement</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Analyzer</class>
+   <extends>QTabWidget</extends>
+   <header>Analyzer</header>
+   <container>1</container>
+   <slots>
+    <signal>setPieChartTree(PyQt_PyObject)</signal>
+    <signal>setErrorbarChart(PyQt_PyObject)</signal>
+    <signal>setPieChart(PyQt_PyObject)</signal>
+    <signal>setErrorbarChartTree(PyQt_PyObject)</signal>
+    <slot>load_data()</slot>
+    <slot>load_speedup_data()</slot>
+    <slot>load_pie_chart()</slot>
+    <slot>load_errorbar_chart()</slot>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>PieChartWidget</class>
+   <extends>QWidget</extends>
+   <header>Charts</header>
+   <container>1</container>
+   <slots>
+    <slot>draw(PyQt_PyObject)</slot>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>PieChartTree</class>
+   <extends>QTreeWidget</extends>
+   <header>Analyzer</header>
+   <slots>
+    <signal>drawPieChart(PyQt_PyObject,PyQt_PyObject,PyQt_PyObject)</signal>
+    <slot>load_data(PyQt_PyObject)</slot>
+    <slot>current_item_changed(QTreeWidgetItem*,QTreeWidgetItem*)</slot>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>ErrorbarChartTree</class>
+   <extends>QTreeWidget</extends>
+   <header>Analyzer</header>
+   <slots>
+    <signal>drawErrorbarChart(PyQt_PyObject,PyQt_PyObject)</signal>
+    <slot>load_data(PyQt_PyObject)</slot>
+    <slot>current_item_changed(QTreeWidgetItem*,QTreeWidgetItem*)</slot>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>ErrorbarChartWidget</class>
+   <extends>QWidget</extends>
+   <header>Charts</header>
+   <container>1</container>
+   <slots>
+    <slot>draw(PyQt_PyObject,PyQt_PyObject)</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnLoadData</sender>
+   <signal>activated()</signal>
+   <receiver>AnalyzerWidget</receiver>
+   <slot>load_data()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>393</x>
+     <y>307</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>AnalyzerWidget</sender>
+   <signal>setPieChartTree(PyQt_PyObject)</signal>
+   <receiver>PieChartTree</receiver>
+   <slot>load_data(PyQt_PyObject)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>393</x>
+     <y>307</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>385</x>
+     <y>322</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PieChartTree</sender>
+   <signal>drawPieChart(PyQt_PyObject,PyQt_PyObject,PyQt_PyObject)</signal>
+   <receiver>PieChart</receiver>
+   <slot>draw(PyQt_PyObject)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>385</x>
+     <y>322</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>761</x>
+     <y>322</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>AnalyzerWidget</sender>
+   <signal>setErrorbarChartTree(PyQt_PyObject)</signal>
+   <receiver>ErrorbarChartTree</receiver>
+   <slot>load_data(PyQt_PyObject)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>393</x>
+     <y>301</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>385</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ErrorbarChartTree</sender>
+   <signal>currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)</signal>
+   <receiver>ErrorbarChartTree</receiver>
+   <slot>current_item_changed(QTreeWidgetItem*,QTreeWidgetItem*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>385</x>
+     <y>315</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>147</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ErrorbarChartTree</sender>
+   <signal>drawErrorbarChart(PyQt_PyObject,PyQt_PyObject)</signal>
+   <receiver>ErrorbarChart</receiver>
+   <slot>draw(PyQt_PyObject,PyQt_PyObject)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>385</x>
+     <y>315</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>761</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PieChartTree</sender>
+   <signal>currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)</signal>
+   <receiver>PieChartTree</receiver>
+   <slot>current_item_changed(QTreeWidgetItem*,QTreeWidgetItem*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>385</x>
+     <y>315</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>385</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>load_run_dialog()</slot>
+ </slots>
+</ui>
