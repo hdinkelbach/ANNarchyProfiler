@@ -99,6 +99,7 @@
     </property>
     <addaction name="btnLoadData"/>
     <addaction name="btnRunMeasurement"/>
+    <addaction name="btnSave"/>
    </widget>
    <addaction name="menuStart"/>
   </widget>
@@ -117,6 +118,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="btnSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
  </widget>

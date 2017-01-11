@@ -32,17 +32,46 @@ class ANNarchyProfilerWindow(QMainWindow):
         super(self.__class__, self).__init__()
         self.ui = loadUi("ANNarchyProfiler.ui")
         
+        # actions menubar
         self.ui.connect(self.ui.btnRunMeasurement, SIGNAL("activated()"), self.load_run_dialog)
+        self.ui.connect(self.ui.btnSave, SIGNAL("activated()"), self.save_chart)
     
     @pyqtSlot()
     def load_run_dialog(self):
+        """
+        Shows a dialog to enter data for a ANNarchy profile run.
+        
+        Signals:
+            * activated() emitted from btnRunMeasurement in menubar
+        """
         diag = ANNarchyRunDialog()
         script, path, args = diag.get_data()
         
-        #print(script)
         os.system("cd " + str(path))
         os.system("python " + str(script) + " --profile --profile_out=" + str(path) + "measurement.xml " + str(args))
         self.ui.AnalyzerWidget.set_data(str(path) + "measurement.xml")
+    
+    @pyqtSlot()
+    def save_chart(self):
+        """
+        Saves the current shown chart as a file.
+        
+        Signals:
+            * activated() emitted from btnSave in menubar
+        """
+        
+        # tab "Standardabweichung" selected
+        if(self.ui.AnalyzerWidget.currentIndex() == 0):
+            figure = self.ui.ErrorbarChart.figure()
+            
+        # tab "Torte" selected
+        elif(self.ui.AnalyzerWidget.currentIndex() == 1):
+            figure = self.ui.PieChart.figure()
+        
+        if(figure != 0):
+            fname = QFileDialog.getSaveFileName(self, 'Save chart file', './chart.png', 'Image file (*.png *.jpg);;PDF file (*.pdf)')
+            if(fname):
+                figure.savefig(str(fname))
     
     def show(self):
         self.ui.show()

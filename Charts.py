@@ -43,6 +43,12 @@ class MatplotlibWidget(QtGui.QWidget):
 
         self.layoutVertical = QtGui.QVBoxLayout(self)
         self.layoutVertical.addWidget(self._canvas)
+        
+    def figure(self):
+        """
+        Return the figure/chart of the widget
+        """
+        return self._figure
 
 class PieChartWidget(MatplotlibWidget):
     """
