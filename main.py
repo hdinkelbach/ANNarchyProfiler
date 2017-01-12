@@ -1,8 +1,8 @@
 #==============================================================================
 #
-#     CodeGenerator.py
+#     main.py
 #
-#     This file is part of ANNarchy.
+#     This file is part of ANNarchyProfiler.
 #
 #     Copyright (C) 2016-2019  Toni Freitag <tfreitag93@gmail.com>,
 #     Helge Uelo Dinkelbach <helge.dinkelbach@gmail.com>
@@ -12,7 +12,7 @@
 #     the Free Software Foundation, either version 3 of the License, or
 #     (at your option) any later version.
 #
-#     ANNarchy is distributed in the hope that it will be useful,
+#     ANNarchyProfiler is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #     GNU General Public License for more details.
@@ -21,63 +21,16 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #==============================================================================
-from PyQt4.QtCore import pyqtSlot, SIGNAL
-from PyQt4.QtGui import QApplication, QDialog, QFileDialog, QMainWindow
+from PyQt4.QtCore import SIGNAL
+from PyQt4.QtGui import QApplication, QDialog, QFileDialog
 from PyQt4.uic import loadUi
+
+from ProfilerWindow import ProfilerWindow
 
 import sys, os
 
-class ANNarchyProfilerWindow(QMainWindow):
-    def __init__(self):
-        super(self.__class__, self).__init__()
-        self.ui = loadUi("ANNarchyProfiler.ui")
         
-        # actions menubar
-        self.ui.connect(self.ui.btnRunMeasurement, SIGNAL("activated()"), self.load_run_dialog)
-        self.ui.connect(self.ui.btnSave, SIGNAL("activated()"), self.save_chart)
-    
-    @pyqtSlot()
-    def load_run_dialog(self):
-        """
-        Shows a dialog to enter data for a ANNarchy profile run.
-        
-        Signals:
-            * activated() emitted from btnRunMeasurement in menubar
-        """
-        diag = ANNarchyRunDialog()
-        script, path, args = diag.get_data()
-        
-        if(script != ""):
-            os.system("cd " + str(path))
-            os.system("python " + str(script) + " --profile --profile_out=" + str(path) + "/measurement.xml " + str(args))
-            self.ui.AnalyzerWidget.set_data(str(path) + "/measurement.xml")
-    
-    @pyqtSlot()
-    def save_chart(self):
-        """
-        Saves the current shown chart as a file.
-        
-        Signals:
-            * activated() emitted from btnSave in menubar
-        """
-        
-        # tab "Standardabweichung" selected
-        if(self.ui.AnalyzerWidget.currentIndex() == 0):
-            figure = self.ui.ErrorbarChart.figure()
-            
-        # tab "Torte" selected
-        elif(self.ui.AnalyzerWidget.currentIndex() == 1):
-            figure = self.ui.PieChart.figure()
-        
-        if(figure != 0):
-            fname = QFileDialog.getSaveFileName(self, 'Save chart file', './chart.png', 'Image file (*.png *.jpg);;PDF file (*.pdf)')
-            if(fname):
-                figure.savefig(str(fname))
-    
-    def show(self):
-        self.ui.show()
-        
-class ANNarchyRunDialog(QDialog):
+class RunDialog(QDialog):
     def __init__(self):
         super(self.__class__, self).__init__()
         self.ui = loadUi("ANNarchyRunDialog.ui")
@@ -105,6 +58,6 @@ class ANNarchyRunDialog(QDialog):
 
 if __name__ == '__main__': 
     app = QApplication(sys.argv)
-    window = ANNarchyProfilerWindow()
+    window = ProfilerWindow()
     window.show()
     app.exec_() 

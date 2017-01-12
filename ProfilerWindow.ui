@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ANNarchyProfilerWindow</class>
- <widget class="QMainWindow" name="ANNarchyProfilerWindow">
+ <class>ProfilerWindow</class>
+ <widget class="QMainWindow" name="ProfilerWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -14,7 +14,26 @@
    <string>ANNarchy Profiler</string>
   </property>
   <widget class="QWidget" name="CentralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QComboBox" name="cmbThread">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>250</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+     </widget>
+    </item>
     <item>
      <widget class="Analyzer" name="AnalyzerWidget">
       <property name="currentIndex">
@@ -103,7 +122,6 @@
    </widget>
    <addaction name="menuStart"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="btnLoadData">
    <property name="text">
     <string>Load data</string>
