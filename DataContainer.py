@@ -77,7 +77,7 @@ class DataContainer(object):
                     self._paradigm = child.text
  
                 if child.tag == "num_threads":
-                    self._num_threads = child.text
+                    self._num_threads = int(child.text)
  
  
         # performance data
