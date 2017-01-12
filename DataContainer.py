@@ -107,10 +107,16 @@ class DataContainer(object):
                 self._data[num_tests][obj_type][num][func] = {"mean" : mean, "std" : std, "raw" :  raw}
                 
         self._num_tests = num_tests
-        
+    
+    def num_threads(self):
+        """
+        Return Number of threads
+        """
+        return self._num_tests
+    
     def num_tests(self):
         """
-            Number of measurements
+        Return Number of measurements
         """
         return self._num_tests
 
