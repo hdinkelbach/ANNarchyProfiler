@@ -112,7 +112,7 @@ class DataContainer(object):
         """
         Return Number of threads
         """
-        return self._num_tests
+        return self._num_threads
     
     def num_tests(self):
         """
