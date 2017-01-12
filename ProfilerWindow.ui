@@ -35,7 +35,7 @@
      </widget>
     </item>
     <item>
-     <widget class="Analyzer" name="AnalyzerWidget">
+     <widget class="QTabWidget" name="AnalyzerWidget">
       <property name="currentIndex">
        <number>0</number>
       </property>
@@ -122,6 +122,17 @@
    </widget>
    <addaction name="menuStart"/>
   </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
   <action name="btnLoadData">
    <property name="text">
     <string>Load data</string>
@@ -148,22 +159,6 @@
   </action>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>Analyzer</class>
-   <extends>QTabWidget</extends>
-   <header>Analyzer</header>
-   <container>1</container>
-   <slots>
-    <signal>setPieChartTree(PyQt_PyObject)</signal>
-    <signal>setErrorbarChart(PyQt_PyObject)</signal>
-    <signal>setPieChart(PyQt_PyObject)</signal>
-    <signal>setErrorbarChartTree(PyQt_PyObject)</signal>
-    <slot>load_data()</slot>
-    <slot>load_speedup_data()</slot>
-    <slot>load_pie_chart()</slot>
-    <slot>load_errorbar_chart()</slot>
-   </slots>
-  </customwidget>
   <customwidget>
    <class>PieChartWidget</class>
    <extends>QWidget</extends>
@@ -206,38 +201,6 @@
  <resources/>
  <connections>
   <connection>
-   <sender>btnLoadData</sender>
-   <signal>activated()</signal>
-   <receiver>AnalyzerWidget</receiver>
-   <slot>load_data()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>393</x>
-     <y>307</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>AnalyzerWidget</sender>
-   <signal>setPieChartTree(PyQt_PyObject)</signal>
-   <receiver>PieChartTree</receiver>
-   <slot>load_data(PyQt_PyObject)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>393</x>
-     <y>307</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>385</x>
-     <y>322</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>PieChartTree</sender>
    <signal>drawPieChart(PyQt_PyObject,PyQt_PyObject,PyQt_PyObject)</signal>
    <receiver>PieChart</receiver>
@@ -250,22 +213,6 @@
     <hint type="destinationlabel">
      <x>761</x>
      <y>322</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>AnalyzerWidget</sender>
-   <signal>setErrorbarChartTree(PyQt_PyObject)</signal>
-   <receiver>ErrorbarChartTree</receiver>
-   <slot>load_data(PyQt_PyObject)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>393</x>
-     <y>301</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>385</x>
-     <y>315</y>
     </hint>
    </hints>
   </connection>
@@ -318,7 +265,4 @@
    </hints>
   </connection>
  </connections>
- <slots>
-  <slot>load_run_dialog()</slot>
- </slots>
 </ui>
