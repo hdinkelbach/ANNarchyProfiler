@@ -22,7 +22,7 @@
 #
 #==============================================================================
 
-from PyQt4.QtCore import pyqtSlot, SIGNAL
+from PyQt4.QtCore import pyqtSlot, Qt, SIGNAL
 from PyQt4.QtGui import QFileDialog, QMainWindow, QMessageBox, QTreeWidgetItem
 from PyQt4.uic import loadUi
 
@@ -40,16 +40,18 @@ class ProfilerWindow(QMainWindow):
         self.ui = loadUi("ProfilerWindow.ui")
         
         # actions menubar
-        self.ui.connect(self.ui.btnLoadData, SIGNAL('activated()'), self.load_data_dialog)
-        self.ui.connect(self.ui.btnRunMeasurement, SIGNAL('activated()'), self.load_run_dialog)
-        self.ui.connect(self.ui.btnSave, SIGNAL('activated()'), self.save_chart)
+        self.ui.btnLoadData.activated.connect(self.load_data_dialog)
+        self.ui.btnRunMeasurement.activated.connect(self.load_run_dialog)
+        self.ui.btnSave.activated.connect(self.save_chart)
         
         # action combobox
-        self.ui.connect(self.ui.cmbThread, SIGNAL('currentIndexChanged(int)'), self.change_combobox)
+        self.ui.cmbThread.currentIndexChanged.connect(self.change_combobox)
         
         # action TreeWidgets
-        self.ui.connect(self.ui.PieChartTree, SIGNAL('currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)'), self.change_piechart_tree)
-        self.ui.connect(self.ui.ErrorbarChartTree, SIGNAL('currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)'), self.change_errorbarchart_tree)
+        self.ui.PieChartTree.currentItemChanged.connect(self.change_piechart_tree)
+        self.ui.ErrorbarChartTree.currentItemChanged.connect(self.change_errorbarchart_tree)
+        self.ui.FunctionSelectTree.itemSelectionChanged.connect(self.change_multithread_selection)
+        self.ui.ThreadSelectTree.itemChanged.connect(self.change_multithread_selection)
         
         # set class variables 
         self._data = {}
@@ -59,8 +61,8 @@ class ProfilerWindow(QMainWindow):
         
     def add_data(self, data):
         """
-        Add a DataContainer instance to test-data.
-        Ask for overwriting if a test with same number of threads exists.
+        Add a DataContainer instance to measurement-data.
+        Ask for overwriting if a measurement with same number of threads exists.
         """
         if self._data.has_key(data.num_threads()):
             msg = QMessageBox()
@@ -73,6 +75,8 @@ class ProfilerWindow(QMainWindow):
         
         self._data[data.num_threads()] = data
         self.update_combobox()
+        self.update_function_select()
+        self.update_thread_select()
         
     def current_data(self):
         return self._data[self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toInt()[0]]
@@ -145,14 +149,14 @@ class ProfilerWindow(QMainWindow):
     #==============================================================================
     
     @pyqtSlot()
-    def change_combobox(self, idx):
+    def change_combobox(self):
         """
         Update TreeViews if combobox changed.
         
         Signals:
             * currentIndexChanged(int) emitted from cmbThread
         """
-        if self.ui.cmbThread.itemData(idx).toInt()[1]:
+        if self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toInt()[1]:
             self.update_piechart_tree()
             self.update_errorbarchart_tree()
     
@@ -163,7 +167,73 @@ class ProfilerWindow(QMainWindow):
         self.ui.cmbThread.clear()
         for key in self._data:
             self.ui.cmbThread.addItem(str(key) + " Threads ", key)
+    
+    #==============================================================================
+    # actions for the MultiThreadTab
+    #==============================================================================
+    
+    def change_multithread_selection(self):
+        """
+        Change the errorbar chart in the multi thread tab if some selection changed.
+        
+        Signals:
+            * itemSelectionChanged() emitted from FunctionSelectTree
+            * itemChanged() emitted from ThreadSelectionTree
+        """
+        current = self.ui.FunctionSelectTree.selectedItems()
+        
+        if len(current) == 0:
+            return
+        
+        root = self.ui.ThreadSelectTree.invisibleRootItem()
+        idx = []
+        for i in range(root.childCount()):
+            if root.child(i).checkState(0) == Qt.Checked:
+                idx.append(self.ui.cmbThread.itemData(i).toInt()[0])
+        
+        if len(idx) == 0:
+            return
+        
+        mean_values = []
+        std_values = []
+        labels = []
+        
+        obj = str(current[0].text(0)).split(" - ")
+        for i in idx:
+            mean_values.append(self._data[i].values_each_test(obj[0], obj[1], "mean"))
+            std_values.append(self._data[i].values_each_test(obj[0], obj[1], "std"))
+            labels.append(str(i) + " Threads")
             
+        self.ui.MultiThreadChart.draw(mean_values, std_values, labels)
+        
+    def update_function_select(self):
+        """
+        Load no data in FunctionSelectTree if new file was added
+        """
+        names = self.current_data().unique_function_names()
+        l = []
+        for name in names:
+            l.append(QTreeWidgetItem([name]))
+        
+        self.ui.FunctionSelectTree.clear()
+        self.ui.FunctionSelectTree.addTopLevelItems(l)
+        self.ui.FunctionSelectTree.setCurrentItem(l[0])
+    
+    def update_thread_select(self):
+        """
+        Load no data in ThreadSelectTree if new file was added
+        """
+        
+        l = []
+        for key in self._data:
+            item = QTreeWidgetItem([str(key) + " Threads"])
+            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
+            item.setCheckState(0, Qt.Unchecked) 
+            l.append(item)
+        
+        self.ui.ThreadSelectTree.clear()
+        self.ui.ThreadSelectTree.addTopLevelItems(l)
+         
     
     #==============================================================================
     # actions for the TreeWidget of ErrorbarChart
@@ -176,8 +246,8 @@ class ProfilerWindow(QMainWindow):
         """
         if current:
             obj = str(current.text(0)).split(" - ")
-            mean_values = self.current_data().values_each_test(obj[0], obj[1], "mean")
-            std_values = self.current_data().values_each_test(obj[0], obj[1], "std")
+            mean_values = [self.current_data().values_each_test(obj[0], obj[1], "mean")]
+            std_values = [self.current_data().values_each_test(obj[0], obj[1], "std")]
             
             self.ui.ErrorbarChart.draw(mean_values, std_values)
             

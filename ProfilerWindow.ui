@@ -36,8 +36,14 @@
     </item>
     <item>
      <widget class="QTabWidget" name="AnalyzerWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="deviation_chart">
        <attribute name="title">
@@ -81,6 +87,12 @@
        <layout class="QHBoxLayout" name="pie_chart_layout">
         <item>
          <widget class="QTreeWidget" name="PieChartTree">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+            <horstretch>100</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <attribute name="headerVisible">
            <bool>false</bool>
           </attribute>
@@ -96,6 +108,56 @@
         </item>
         <item alignment="Qt::AlignHCenter">
          <widget class="PieChartWidget" name="PieChart" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="MultiThreadTab">
+       <attribute name="title">
+        <string>Multi-Thread</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QTreeWidget" name="ThreadSelectTree">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <attribute name="headerVisible">
+             <bool>false</bool>
+            </attribute>
+            <column>
+             <property name="text">
+              <string notr="true">1</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTreeWidget" name="FunctionSelectTree">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <attribute name="headerVisible">
+             <bool>false</bool>
+            </attribute>
+            <column>
+             <property name="text">
+              <string notr="true">1</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="ErrorbarChartWidget" name="MultiThreadChart" native="true"/>
         </item>
        </layout>
       </widget>
@@ -121,17 +183,6 @@
     <addaction name="btnSave"/>
    </widget>
    <addaction name="menuStart"/>
-  </widget>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
   </widget>
   <action name="btnLoadData">
    <property name="text">
