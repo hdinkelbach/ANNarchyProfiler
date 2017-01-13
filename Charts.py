@@ -1,8 +1,8 @@
 #==============================================================================
 #
-#     CodeGenerator.py
+#     Charts.py
 #
-#     This file is part of ANNarchy.
+#     This file is part of ANNarchyProfiler.
 #
 #     Copyright (C) 2016-2019  Toni Freitag <tfreitag93@gmail.com>,
 #     Helge Uelo Dinkelbach <helge.dinkelbach@gmail.com>
@@ -12,7 +12,7 @@
 #     the Free Software Foundation, either version 3 of the License, or
 #     (at your option) any later version.
 #
-#     ANNarchy is distributed in the hope that it will be useful,
+#     ANNarchyProfiler is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #     GNU General Public License for more details.

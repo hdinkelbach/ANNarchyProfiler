@@ -21,8 +21,9 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #==============================================================================
+
 from PyQt4.QtCore import pyqtSlot, SIGNAL
-from PyQt4.QtGui import QFileDialog, QMainWindow, QMessageBox
+from PyQt4.QtGui import QFileDialog, QMainWindow, QMessageBox, QTreeWidgetItem
 from PyQt4.uic import loadUi
 
 from DataContainer import DataContainer
@@ -45,6 +46,10 @@ class ProfilerWindow(QMainWindow):
         
         # action combobox
         self.ui.connect(self.ui.cmbThread, SIGNAL('currentIndexChanged(int)'), self.change_combobox)
+        
+        # action TreeWidgets
+        self.ui.connect(self.ui.PieChartTree, SIGNAL('currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)'), self.change_piechart_tree)
+        self.ui.connect(self.ui.ErrorbarChartTree, SIGNAL('currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)'), self.change_errorbarchart_tree)
         
         # set class variables 
         self._data = {}
@@ -69,32 +74,9 @@ class ProfilerWindow(QMainWindow):
         self._data[data.num_threads()] = data
         self.update_combobox()
         
+    def current_data(self):
+        return self._data[self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toInt()[0]]
         
-    #==============================================================================
-    # actions for the combobox for choosing test-data
-    #==============================================================================
-    
-    @pyqtSlot()
-    def change_combobox(self, idx):
-        """
-        Update TreeViews if combobox changed.
-        
-        Signals:
-            * currentIndexChanged(int) emitted from cmbThread
-        """
-        if self.ui.cmbThread.itemData(idx).toInt()[1]:
-            key = self.ui.cmbThread.itemData(idx).toInt()[0]
-            self.ui.PieChartTree.load_data(self._data[key])
-            self.ui.ErrorbarChartTree.load_data(self._data[key])
-    
-    def update_combobox(self):
-        """
-        Update the items of the combobox from test data
-        """
-        self.ui.cmbThread.clear()
-        for key in self._data:
-            self.ui.cmbThread.addItem(str(key) + " Threads ", key)
-    
     
     #==============================================================================
     # actions for the buttons in the menubar
@@ -115,7 +97,6 @@ class ProfilerWindow(QMainWindow):
             data.load_data(fname)
             self.add_data(data)
         
-    
     @pyqtSlot()
     def load_run_dialog(self):
         """
@@ -158,3 +139,143 @@ class ProfilerWindow(QMainWindow):
             if(fname):
                 figure.savefig(str(fname))
     
+    
+    #==============================================================================
+    # actions for the combobox for choosing test-data
+    #==============================================================================
+    
+    @pyqtSlot()
+    def change_combobox(self, idx):
+        """
+        Update TreeViews if combobox changed.
+        
+        Signals:
+            * currentIndexChanged(int) emitted from cmbThread
+        """
+        if self.ui.cmbThread.itemData(idx).toInt()[1]:
+            self.update_piechart_tree()
+            self.update_errorbarchart_tree()
+    
+    def update_combobox(self):
+        """
+        Update the items of the combobox from test data
+        """
+        self.ui.cmbThread.clear()
+        for key in self._data:
+            self.ui.cmbThread.addItem(str(key) + " Threads ", key)
+            
+    
+    #==============================================================================
+    # actions for the TreeWidget of ErrorbarChart
+    #==============================================================================
+    
+    @pyqtSlot(QTreeWidgetItem,QTreeWidgetItem)
+    def change_errorbarchart_tree(self, current, previous):
+        """
+        If selection changed then filter data and draw chart.
+        """
+        if current:
+            obj = str(current.text(0)).split(" - ")
+            mean_values = self.current_data().values_each_test(obj[0], obj[1], "mean")
+            std_values = self.current_data().values_each_test(obj[0], obj[1], "std")
+            
+            self.ui.ErrorbarChart.draw(mean_values, std_values)
+            
+    def update_errorbarchart_tree(self):
+        """
+        Fill TreeWidget with data from cointainer.
+        """
+        names = self.current_data().unique_function_names()
+        l = []
+        for name in names:
+            l.append(QTreeWidgetItem([name]))
+        
+        self.ui.ErrorbarChartTree.clear()
+        self.ui.ErrorbarChartTree.addTopLevelItems(l)
+        
+    
+    #==============================================================================
+    # actions for the TreeWidget of PieChart
+    #==============================================================================
+    
+    @pyqtSlot(QTreeWidgetItem,QTreeWidgetItem)
+    def change_piechart_tree(self, current, previous):
+        """
+        If selection changed then filter data and draw chart.    
+        """
+        if current:
+            topIdx = self.ui.PieChartTree.invisibleRootItem().indexOfChild(current)
+            if topIdx != -1: # top element? (Network)
+                values = self.current_data().values_by_type(topIdx, "net")
+                
+                # net-step = overhead + net-proj_step + net-psp + net-neur_step
+                overhead = values["step"]["mean"] - (values["proj_step"]["mean"] + values["psp"]["mean"] + values["neur_step"]["mean"])
+                    
+                data = [
+                        ["Overhead\n(" + "%.4f" % overhead + ")", "%.4f" % overhead],
+                        ["proj_step\n(" + "%.4f" % values["proj_step"]["mean"] + ")", "%.4f" % values["proj_step"]["mean"]],
+                        ["psp\n(" + "%.4f" % values["psp"]["mean"] + ")", "%.4f" % values["psp"]["mean"]],
+                        ["neur_step\n(" + "%.4f" % values["neur_step"]["mean"] + ")", "%.4f" % values["neur_step"]["mean"]]
+                    ]
+                self.ui.PieChart.draw(data, current.text(0) + " (in ms)", True)
+            else:
+                childIdx = current.parent().indexOfChild(current)
+                topIdx = self.ui.PieChartTree.invisibleRootItem().indexOfChild(current.parent())
+                if topIdx != -1: # First child of Network?
+                    
+                    if childIdx == 0:
+                        neur_step = self.current_data().values_by_function(topIdx, "net", "neur_step")
+                        func_data = self.current_data().values_by_function(topIdx, "pop", "step")
+    
+                        overhead = neur_step["mean"]
+                        values = []
+                        for key,value in func_data.items():
+    
+                            overhead -= value["mean"]
+                            values.append(["pop" + str(key), "%.4f" % value["mean"]])
+                        
+                        values.append(["overhead", "%.4f" % overhead])
+                        
+                    if childIdx == 1:
+                        proj_step = self.current_data().values_by_function(topIdx, "net", "proj_step")
+                        func_data = self.current_data().values_by_function(topIdx, "proj", "step")
+    
+                        overhead = proj_step["mean"]
+                        values = []
+                        for key,value in func_data.items():
+    
+                            overhead -= value["mean"]
+                            values.append(["proj" + str(key), "%.4f" % value["mean"]])
+                        
+                        values.append(["overhead", "%.4f" % overhead])
+                        
+                    if childIdx == 2:
+                        net_psp = self.current_data().values_by_function(topIdx, "net", "psp")
+                        func_data = self.current_data().values_by_function(topIdx, "proj", "psp")
+    
+                        overhead = net_psp["mean"]
+                        values = []
+                        for key,value in func_data.items():
+    
+                            overhead -= value["mean"]
+                            values.append(["proj" + str(key), "%.4f" % value["mean"]])
+                        
+                        values.append(["overhead", "%.4f" % overhead])
+                    
+                    self.ui.PieChart.draw(values, current.text(0) + " (in ms)", False)
+            
+    def update_piechart_tree(self):
+        """
+        Fill TreeWidget with data from cointainer.
+        """
+        wdg = self.ui.PieChartTree
+        l = []
+        for i in xrange(self.current_data().num_tests()):
+            item = QTreeWidgetItem(["Measurement " + str(i)])
+            item.addChild(QTreeWidgetItem(["pop - step"]))
+            item.addChild(QTreeWidgetItem(["proj - step"]))
+            item.addChild(QTreeWidgetItem(["proj - psp"]))
+            l.append(item)
+        
+        wdg.clear()
+        wdg.addTopLevelItems(l)

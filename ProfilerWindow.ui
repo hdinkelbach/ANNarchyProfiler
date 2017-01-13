@@ -45,7 +45,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="errorbar_chart_layout">
         <item>
-         <widget class="ErrorbarChartTree" name="ErrorbarChartTree">
+         <widget class="QTreeWidget" name="ErrorbarChartTree">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
             <horstretch>100</horstretch>
@@ -80,7 +80,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="pie_chart_layout">
         <item>
-         <widget class="PieChartTree" name="PieChartTree">
+         <widget class="QTreeWidget" name="PieChartTree">
           <attribute name="headerVisible">
            <bool>false</bool>
           </attribute>
@@ -164,105 +164,14 @@
    <extends>QWidget</extends>
    <header>Charts</header>
    <container>1</container>
-   <slots>
-    <slot>draw(PyQt_PyObject)</slot>
-   </slots>
-  </customwidget>
-  <customwidget>
-   <class>PieChartTree</class>
-   <extends>QTreeWidget</extends>
-   <header>Analyzer</header>
-   <slots>
-    <signal>drawPieChart(PyQt_PyObject,PyQt_PyObject,PyQt_PyObject)</signal>
-    <slot>load_data(PyQt_PyObject)</slot>
-    <slot>current_item_changed(QTreeWidgetItem*,QTreeWidgetItem*)</slot>
-   </slots>
-  </customwidget>
-  <customwidget>
-   <class>ErrorbarChartTree</class>
-   <extends>QTreeWidget</extends>
-   <header>Analyzer</header>
-   <slots>
-    <signal>drawErrorbarChart(PyQt_PyObject,PyQt_PyObject)</signal>
-    <slot>load_data(PyQt_PyObject)</slot>
-    <slot>current_item_changed(QTreeWidgetItem*,QTreeWidgetItem*)</slot>
-   </slots>
   </customwidget>
   <customwidget>
    <class>ErrorbarChartWidget</class>
    <extends>QWidget</extends>
    <header>Charts</header>
    <container>1</container>
-   <slots>
-    <slot>draw(PyQt_PyObject,PyQt_PyObject)</slot>
-   </slots>
   </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>PieChartTree</sender>
-   <signal>drawPieChart(PyQt_PyObject,PyQt_PyObject,PyQt_PyObject)</signal>
-   <receiver>PieChart</receiver>
-   <slot>draw(PyQt_PyObject)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>385</x>
-     <y>322</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>761</x>
-     <y>322</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ErrorbarChartTree</sender>
-   <signal>currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)</signal>
-   <receiver>ErrorbarChartTree</receiver>
-   <slot>current_item_changed(QTreeWidgetItem*,QTreeWidgetItem*)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>385</x>
-     <y>315</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>147</x>
-     <y>315</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ErrorbarChartTree</sender>
-   <signal>drawErrorbarChart(PyQt_PyObject,PyQt_PyObject)</signal>
-   <receiver>ErrorbarChart</receiver>
-   <slot>draw(PyQt_PyObject,PyQt_PyObject)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>385</x>
-     <y>315</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>761</x>
-     <y>315</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>PieChartTree</sender>
-   <signal>currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)</signal>
-   <receiver>PieChartTree</receiver>
-   <slot>current_item_changed(QTreeWidgetItem*,QTreeWidgetItem*)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>385</x>
-     <y>315</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>385</x>
-     <y>315</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
