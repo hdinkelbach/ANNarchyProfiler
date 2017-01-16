@@ -54,6 +54,9 @@ class ProfilerWindow(QMainWindow):
         self.ui.FunctionSelectTree.itemSelectionChanged.connect(self.change_multithread_selection)
         self.ui.ThreadSelectTree.itemChanged.connect(self.change_multithread_selection)
         
+        # action checkbox
+        self.ui.chkStdValues.stateChanged.connect(self.change_std_state)
+        
         # set class variables 
         self._data = {}
     
@@ -152,6 +155,23 @@ class ProfilerWindow(QMainWindow):
             if fname:
                 figure.savefig(str(fname))
     
+    #==============================================================================
+    # actions for the show std values
+    #==============================================================================
+    
+    @pyqtSlot()
+    def change_std_state(self):
+        """
+        Update ErrorbarChart and MultiThread Chart if state of std state checkbox changed
+        
+        Signals:
+            * stateChanged(int) emitted from chkStdState
+        """
+        if len(self.ui.ErrorbarChartTree.selectedItems()) != 0:
+            self.change_errorbarchart_tree(self.ui.ErrorbarChartTree.selectedItems()[0])
+            
+        self.change_multithread_selection()
+    
     
     #==============================================================================
     # actions for the combobox for choosing test-data
@@ -213,8 +233,11 @@ class ProfilerWindow(QMainWindow):
             mean_values.append(self._data[i].values_each_test(obj[0], obj[1], "mean"))
             std_values.append(self._data[i].values_each_test(obj[0], obj[1], "std"))
             labels.append(str(i) + " Threads")
-            
-        self.ui.MultiThreadChart.draw(mean_values, std_values, labels)
+        
+        if self.ui.chkStdValues.isChecked():
+            self.ui.MultiThreadChart.draw(mean_values, std_values, labels)
+        else:
+            self.ui.MultiThreadChart.draw(mean_values, labels=labels)
         
         # if no data with 1 thread than exit
         if self._data.has_key(1) == False:
@@ -270,7 +293,7 @@ class ProfilerWindow(QMainWindow):
     #==============================================================================
     
     @pyqtSlot(QTreeWidgetItem,QTreeWidgetItem)
-    def change_errorbarchart_tree(self, current, previous):
+    def change_errorbarchart_tree(self, current, previous=0):
         """
         If selection changed then filter data and draw chart.
         """
@@ -279,7 +302,10 @@ class ProfilerWindow(QMainWindow):
             mean_values = [self.current_data().values_each_test(obj[0], obj[1], "mean")]
             std_values = [self.current_data().values_each_test(obj[0], obj[1], "std")]
             
-            self.ui.ErrorbarChart.draw(mean_values, std_values)
+            if self.ui.chkStdValues.isChecked():
+                self.ui.ErrorbarChart.draw(mean_values, std_values)
+            else:
+                self.ui.ErrorbarChart.draw(mean_values)
             
     def update_errorbarchart_tree(self):
         """
