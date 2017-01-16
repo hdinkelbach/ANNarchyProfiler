@@ -107,7 +107,7 @@ class ErrorbarChartWidget(MatplotlibWidget):
     def __init__(self, parent=None):
         super(ErrorbarChartWidget,self).__init__(parent)
         
-    def draw(self, values, std_values=0, labels=[], xlabel="test nr.", ylabel="mean_value"):
+    def draw(self, values, std_values=0, labels=[], xlabel="test nr.", ylabel="mean_value (in ms)"):
         """
         Draw errorbar chart from given data.
         
