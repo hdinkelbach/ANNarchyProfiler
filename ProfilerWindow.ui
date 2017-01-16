@@ -43,7 +43,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="deviation_chart">
        <attribute name="title">
@@ -158,6 +158,19 @@
         </item>
         <item>
          <widget class="ErrorbarChartWidget" name="MultiThreadChart" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="SpeedupTab">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <attribute name="title">
+        <string>Speedup</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="ErrorbarChartWidget" name="SpeedupChart" native="true"/>
         </item>
        </layout>
       </widget>

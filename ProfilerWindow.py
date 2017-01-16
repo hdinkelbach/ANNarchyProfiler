@@ -168,13 +168,14 @@ class ProfilerWindow(QMainWindow):
         for key in self._data:
             self.ui.cmbThread.addItem(str(key) + " Threads ", key)
     
+    
     #==============================================================================
     # actions for the MultiThreadTab
     #==============================================================================
     
     def change_multithread_selection(self):
         """
-        Change the errorbar chart in the multi thread tab if some selection changed.
+        Change the errorbar chart in the multi thread tab and speedup tab if some selection changed.
         
         Signals:
             * itemSelectionChanged() emitted from FunctionSelectTree
@@ -205,6 +206,22 @@ class ProfilerWindow(QMainWindow):
             labels.append(str(i) + " Threads")
             
         self.ui.MultiThreadChart.draw(mean_values, std_values, labels)
+        
+        mean_values = []
+        mean_value = []
+        labels = []
+        mean_one_thread = self._data[1].values_each_test(obj[0], obj[1], "mean")
+        
+        for i in idx:
+            if i != 1:
+                mean_value = self._data[i].values_each_test(obj[0], obj[1], "mean")
+                for n in range(len(mean_value)):
+                    mean_value[n] = mean_one_thread[n] / mean_value[n]
+                    
+                mean_values.append(mean_value)
+                labels.append(str(i) + " Threads")
+            
+        self.ui.SpeedupChart.draw(values=mean_values, labels=labels, ylabel="1 Thread / x Threads")
         
     def update_function_select(self):
         """
