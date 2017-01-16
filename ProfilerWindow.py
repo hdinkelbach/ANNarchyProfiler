@@ -216,6 +216,10 @@ class ProfilerWindow(QMainWindow):
             
         self.ui.MultiThreadChart.draw(mean_values, std_values, labels)
         
+        # if no data with 1 thread than exit
+        if self._data.has_key(1) == False:
+            return
+        
         mean_values = []
         mean_value = []
         labels = []
