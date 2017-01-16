@@ -132,16 +132,24 @@ class ProfilerWindow(QMainWindow):
         """
         
         # tab "Standardabweichung" selected
-        if(self.ui.AnalyzerWidget.currentIndex() == 0):
+        if self.ui.AnalyzerWidget.currentIndex() == 0:
             figure = self.ui.ErrorbarChart.figure()
             
         # tab "Torte" selected
-        elif(self.ui.AnalyzerWidget.currentIndex() == 1):
+        elif self.ui.AnalyzerWidget.currentIndex() == 1:
             figure = self.ui.PieChart.figure()
         
-        if(figure != 0):
+        # tab "Multi-Thread" selected
+        elif self.ui.AnalyzerWidget.currentIndex() == 2:
+            figure = self.ui.MultiThreadChart.figure()
+        
+        # tab "Speedup" selected
+        elif self.ui.AnalyzerWidget.currentIndex() == 3:
+            figure = self.ui.SpeedupChart.figure()
+                
+        if figure != 0:
             fname = QFileDialog.getSaveFileName(self, 'Save chart file', './chart.png', 'Image file (*.png *.jpg);;PDF file (*.pdf)')
-            if(fname):
+            if fname:
                 figure.savefig(str(fname))
     
     
