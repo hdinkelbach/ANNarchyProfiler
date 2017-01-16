@@ -27,6 +27,7 @@ from PyQt4.QtGui import QFileDialog, QMainWindow, QMessageBox, QTreeWidgetItem
 from PyQt4.uic import loadUi
 
 from DataContainer import DataContainer
+from RunDialog import RunDialog
 
 class ProfilerWindow(QMainWindow):
     """
@@ -110,7 +111,7 @@ class ProfilerWindow(QMainWindow):
         Signals:
             * activated() emitted from btnRunMeasurement in menubar
         """
-        diag = ANNarchyRunDialog()
+        diag = RunDialog()
         script, path, args = diag.get_data()
         
         if(script != ""):
