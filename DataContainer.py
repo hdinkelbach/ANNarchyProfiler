@@ -106,7 +106,7 @@ class DataContainer(object):
                     self._data[num_tests][obj_type][num] = {}
                 self._data[num_tests][obj_type][num][func] = {"mean" : mean, "std" : std, "raw" :  raw}
                 
-        self._num_tests = num_tests
+        self._num_tests = num_tests + 1
     
     def num_threads(self):
         """
