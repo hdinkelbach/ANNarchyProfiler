@@ -107,7 +107,7 @@ class ErrorbarChartWidget(MatplotlibWidget):
     def __init__(self, parent=None):
         super(ErrorbarChartWidget,self).__init__(parent)
         
-    def draw(self, values, std_values=0, labels=[], xlabel="test nr.", ylabel="mean_value (in ms)"):
+    def draw(self, values, std_values=0, labels=[], xlabel="test nr.", ylabel="mean_value (in ms)", yscale="linear"):
         """
         Draw errorbar chart from given data.
         
@@ -139,6 +139,7 @@ class ErrorbarChartWidget(MatplotlibWidget):
         #ax.set_title('variable, symmetric error')
         ax.set_xlabel(xlabel, fontsize=18)
         ax.set_ylabel(ylabel, fontsize=18)
+        ax.set_yscale(yscale)
         ax.set_xticks(np.arange(min(x), max(x)+1, 5.0))
         ax.grid(True)
         if len(labels) != 0:

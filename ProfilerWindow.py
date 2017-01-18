@@ -46,7 +46,8 @@ class ProfilerWindow(QMainWindow):
         self.ui.btnSave.activated.connect(self.save_chart)
         
         # action combobox
-        self.ui.cmbThread.currentIndexChanged.connect(self.change_combobox)
+        self.ui.cmbThread.currentIndexChanged.connect(self.change_cmb_thread)
+        self.ui.cmbScale.currentIndexChanged.connect(self.change_std_state)
         
         # action TreeWidgets
         self.ui.PieChartTree.currentItemChanged.connect(self.change_piechart_tree)
@@ -78,7 +79,7 @@ class ProfilerWindow(QMainWindow):
                 return
         
         self._data[data.num_threads()] = data
-        self.update_combobox()
+        self.update_cmb_thread()
         self.update_function_select()
         self.update_thread_select()
         
@@ -166,19 +167,20 @@ class ProfilerWindow(QMainWindow):
         
         Signals:
             * stateChanged(int) emitted from chkStdState
+            * currentIndexChanged(int) emitted from cmbScale
         """
         if len(self.ui.ErrorbarChartTree.selectedItems()) != 0:
             self.change_errorbarchart_tree(self.ui.ErrorbarChartTree.selectedItems()[0])
             
         self.change_multithread_selection()
-    
+
     
     #==============================================================================
     # actions for the combobox for choosing test-data
     #==============================================================================
     
     @pyqtSlot()
-    def change_combobox(self):
+    def change_cmb_thread(self):
         """
         Update TreeViews if combobox changed.
         
@@ -189,7 +191,7 @@ class ProfilerWindow(QMainWindow):
             self.update_piechart_tree()
             self.update_errorbarchart_tree()
     
-    def update_combobox(self):
+    def update_cmb_thread(self):
         """
         Update the items of the combobox from test data
         """
@@ -235,9 +237,9 @@ class ProfilerWindow(QMainWindow):
             labels.append(str(i) + " Threads")
         
         if self.ui.chkStdValues.isChecked():
-            self.ui.MultiThreadChart.draw(mean_values, std_values, labels)
+            self.ui.MultiThreadChart.draw(mean_values, std_values, labels, yscale=str(self.ui.cmbScale.currentText()))
         else:
-            self.ui.MultiThreadChart.draw(mean_values, labels=labels)
+            self.ui.MultiThreadChart.draw(mean_values, labels=labels, yscale=str(self.ui.cmbScale.currentText()))
         
         # if no data with 1 thread than exit
         if self._data.has_key(1) == False:
@@ -257,7 +259,7 @@ class ProfilerWindow(QMainWindow):
                 mean_values.append(mean_value)
                 labels.append(str(i) + " Threads")
             
-        self.ui.SpeedupChart.draw(values=mean_values, labels=labels, ylabel="1 Thread / x Threads")
+        self.ui.SpeedupChart.draw(values=mean_values, labels=labels, ylabel="1 Thread / x Threads", yscale=str(self.ui.cmbScale.currentText()))
         
     def update_function_select(self):
         """
@@ -303,9 +305,9 @@ class ProfilerWindow(QMainWindow):
             std_values = [self.current_data().values_each_test(obj[0], obj[1], "std")]
             
             if self.ui.chkStdValues.isChecked():
-                self.ui.ErrorbarChart.draw(mean_values, std_values)
+                self.ui.ErrorbarChart.draw(mean_values, std_values, yscale=str(self.ui.cmbScale.currentText()))
             else:
-                self.ui.ErrorbarChart.draw(mean_values)
+                self.ui.ErrorbarChart.draw(mean_values, yscale=str(self.ui.cmbScale.currentText()))
             
     def update_errorbarchart_tree(self):
         """

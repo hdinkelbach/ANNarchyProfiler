@@ -43,6 +43,20 @@
        </widget>
       </item>
       <item>
+       <widget class="QComboBox" name="cmbScale">
+        <item>
+         <property name="text">
+          <string>linear</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>log</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="chkStdValues">
         <property name="text">
          <string>Show std values</string>
