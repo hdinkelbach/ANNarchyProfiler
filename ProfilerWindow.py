@@ -60,6 +60,7 @@ class ProfilerWindow(QMainWindow):
         
         # action button
         self.ui.btnRawData.clicked.connect(self.load_raw_data)
+        self.ui.btnRecalc.clicked.connect(self.recalc_errorbar)
         
         # set class variables 
         self._data = {}
@@ -336,6 +337,18 @@ class ProfilerWindow(QMainWindow):
             raw_data = [self.current_data().values_each_test(obj[0], obj[1], "raw")[test_nr]]
             
             self.ui.ErrorbarChart.draw(raw_data, yscale=str(self.ui.cmbScale.currentText()))
+            
+    def recalc_errorbar(self):
+        factor = float(self.ui.txtFactor.text())
+        
+        obj = str(self.ui.ErrorbarChartTree.selectedItems()[0].text(0)).split(" - ")
+        mean_values = [self.current_data().recalc_mean_values(obj[0], obj[1], factor)]
+        std_values = [self.current_data().values_each_test(obj[0], obj[1], "std")]
+        
+        if self.ui.chkStdValues.isChecked():
+            self.ui.ErrorbarChart.draw(mean_values, std_values, yscale=str(self.ui.cmbScale.currentText()))
+        else:
+            self.ui.ErrorbarChart.draw(mean_values, yscale=str(self.ui.cmbScale.currentText()))
             
     
     #==============================================================================

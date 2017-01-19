@@ -186,3 +186,29 @@ class DataContainer(object):
                 values.append(value[match[0]][int(match[1])][func][val_type])
             
         return values
+    
+    def recalc_mean_values(self, obj_type, func, factor):
+        """
+        Filter values by object type, function and recalculate the mean values.
+        
+        Parameter:
+            * obj_type -- Network(net), Projection(proj) or Population(pop)
+            * func -- name of function to filter
+            * factor -- 
+        """
+        
+        mean_values = self.values_each_test(obj_type, func, "mean")
+        std_values = self.values_each_test(obj_type, func, "std")
+        raw_data = self.values_each_test(obj_type, func, "raw")
+        
+        for i in xrange(len(mean_values)):
+            sum = 0
+            count = 0
+            for n in xrange(len(raw_data[i])):
+                if raw_data[i][n] <= (mean_values[i] + factor*std_values[i]) and raw_data[i][n] >= (mean_values[i] - factor*std_values[i]):
+                    count += 1
+                    sum += raw_data[i][n]
+            mean_values[i] = sum / count
+            
+        return mean_values
+        
