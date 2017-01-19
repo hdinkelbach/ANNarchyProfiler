@@ -58,6 +58,9 @@ class ProfilerWindow(QMainWindow):
         # action checkbox
         self.ui.chkStdValues.stateChanged.connect(self.change_std_state)
         
+        # action button
+        self.ui.btnRawData.clicked.connect(self.load_raw_data)
+        
         # set class variables 
         self._data = {}
     
@@ -84,6 +87,7 @@ class ProfilerWindow(QMainWindow):
         self.update_thread_select()
         
     def current_data(self):
+        if self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toInt()[0] == 0: return False
         return self._data[self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toInt()[0]]
         
     
@@ -309,6 +313,10 @@ class ProfilerWindow(QMainWindow):
             else:
                 self.ui.ErrorbarChart.draw(mean_values, yscale=str(self.ui.cmbScale.currentText()))
             
+            self.ui.cmbRawData.clear()
+            for i in xrange(self.current_data().num_tests()):
+                self.ui.cmbRawData.addItem("Test " + str(i), i)
+            
     def update_errorbarchart_tree(self):
         """
         Fill TreeWidget with data from cointainer.
@@ -321,6 +329,14 @@ class ProfilerWindow(QMainWindow):
         self.ui.ErrorbarChartTree.clear()
         self.ui.ErrorbarChartTree.addTopLevelItems(l)
         
+    def load_raw_data(self):
+        if self.current_data() and self.ui.ErrorbarChartTree.selectedItems():
+            obj = str(self.ui.ErrorbarChartTree.selectedItems()[0].text(0)).split(" - ")
+            test_nr = self.ui.cmbRawData.itemData(self.ui.cmbRawData.currentIndex()).toInt()[0]
+            raw_data = [self.current_data().values_each_test(obj[0], obj[1], "raw")[test_nr]]
+            
+            self.ui.ErrorbarChart.draw(raw_data, yscale=str(self.ui.cmbScale.currentText()))
+            
     
     #==============================================================================
     # actions for the TreeWidget of PieChart

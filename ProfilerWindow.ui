@@ -85,10 +85,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="errorbar_chart_layout">
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0">
-          <property name="spacing">
-           <number>6</number>
-          </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
           <property name="rightMargin">
            <number>0</number>
           </property>
@@ -110,6 +107,52 @@
             </column>
            </widget>
           </item>
+          <item>
+           <layout class="QGridLayout" name="gridLayout">
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item row="1" column="0">
+             <widget class="QComboBox" name="cmbRawData"/>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="lblRawData">
+              <property name="text">
+               <string>Raw data</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QPushButton" name="btnRawData">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>70</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Show</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
          </layout>
         </item>
         <item>
