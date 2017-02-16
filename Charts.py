@@ -165,7 +165,7 @@ class ErrorbarChartWidget(MatplotlibWidget):
         ax.set_xlabel(xlabel, fontsize=18)
         ax.set_ylabel(ylabel, fontsize=18)
         ax.set_yscale(yscale)
-        ax.set_xticks(np.arange(min(x), max(x)+1, 5.0))
+        ax.set_xticks(np.arange(min(x), max(x)+1, np.ceil(len(values[0])/20.0)))
         ax.grid(True)
         if len(labels) != 0:
             ax.legend()
