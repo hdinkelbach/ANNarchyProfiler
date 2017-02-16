@@ -60,7 +60,7 @@ class DataContainer(object):
 
     def load_data(self, fname):
         """
-        Load performance data from provided file.
+        Load performance data from provided file. Returns true if successful else false.
  
         Arguments:
             * fname -- absolute path and name of the file.
@@ -78,8 +78,11 @@ class DataContainer(object):
  
                 if child.tag == "num_threads":
                     self._num_threads = int(child.text)
- 
- 
+        
+        # no config-data -> import fails
+        if self._num_threads == 0 or self._paradigm == '':
+            return False;
+        
         # performance data
         matches = doc.findall('dataset')
         
@@ -107,6 +110,8 @@ class DataContainer(object):
                 self._data[num_tests][obj_type][num][func] = {"mean" : mean, "std" : std, "raw" :  raw}
                 
         self._num_tests = num_tests + 1
+        
+        return True;
     
     def num_threads(self):
         """

@@ -22,7 +22,7 @@
 #
 #==============================================================================
 from PyQt4.QtCore import pyqtSlot, Qt, SIGNAL
-from PyQt4.QtGui import QFileDialog, QMainWindow, QMessageBox, QTreeWidgetItem
+from PyQt4.QtGui import QErrorMessage, QFileDialog, QMainWindow, QMessageBox, QTreeWidgetItem
 from PyQt4.uic import loadUi
 
 from DataContainer import DataContainer
@@ -116,8 +116,11 @@ class ProfilerWindow(QMainWindow):
 
         for fname in fnames:
             data = DataContainer()
-            data.load_data(fname)
-            self.add_data(data)
+            if data.load_data(fname) == False:
+                error = QErrorMessage()
+                error.showMessage("Problem while importing data.")
+            else:
+                self.add_data(data)
         
     @pyqtSlot()
     def load_run_dialog(self):
