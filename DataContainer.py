@@ -45,7 +45,7 @@ class DataContainer(object):
         Converts a string containing multiple float or int values
         to an array of float values.
         
-        Parameter:
+        Arguments:
             * strng -- string to be converted to an array
         """
         values = re.split('[\s]+', strng)
@@ -62,7 +62,7 @@ class DataContainer(object):
         """
         Load performance data from provided file.
  
-        Parameter:
+        Arguments:
             * fname -- absolute path and name of the file.
         """
         doc = etree.parse(str(fname))
@@ -124,7 +124,7 @@ class DataContainer(object):
         """
         Returns the values of a network filtered by function and object type
             
-        Parameter:
+        Arguments:
             * index - number of the measurement
             * obj_type - name of the object (net/pop/proj)
             * func - name of the function to filter
@@ -141,7 +141,7 @@ class DataContainer(object):
         """
         Returns the values of a network filtered by object type
             
-        Parameter:
+        Arguments:
             * index -- number of the measurement
             * obj_type -- name of the object to filter
         """
@@ -170,7 +170,7 @@ class DataContainer(object):
         """
         Filter values by object type, function and values type
         
-        Parameter:
+        Arguments:
             * obj_type -- Network(net), Projection(proj) or Population(pop)
             * func -- name of function to filter
             * val_type -- mean, std or raw data
@@ -191,7 +191,7 @@ class DataContainer(object):
         """
         Filter values by object type, function and recalculate the mean values.
         
-        Parameter:
+        Arguments:
             * obj_type -- Network(net), Projection(proj) or Population(pop)
             * func -- name of function to filter
             * factor -- 

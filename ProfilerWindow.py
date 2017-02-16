@@ -21,7 +21,6 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #==============================================================================
-
 from PyQt4.QtCore import pyqtSlot, Qt, SIGNAL
 from PyQt4.QtGui import QFileDialog, QMainWindow, QMessageBox, QTreeWidgetItem
 from PyQt4.uic import loadUi
@@ -31,7 +30,7 @@ from RunDialog import RunDialog
 
 class ProfilerWindow(QMainWindow):
     """
-    MainWindow of the application. Define all actions and hold the data for display.
+    MainWindow of the application. Define all actions and hold the data to display.
     """
     def __init__(self):
         """
@@ -66,12 +65,18 @@ class ProfilerWindow(QMainWindow):
         self._data = {}
     
     def show(self):
+        """
+        Display the widget.
+        """
         self.ui.show()
         
     def add_data(self, data):
         """
-        Add a DataContainer instance to measurement-data.
+        Add a new DataContainer instance to measurement-data.
         Ask for overwriting if a measurement with same number of threads exists.
+        
+        Arguments:
+            * data (DataContainer) -- new data to hold in app
         """
         if self._data.has_key(data.num_threads()):
             msg = QMessageBox()
@@ -88,6 +93,9 @@ class ProfilerWindow(QMainWindow):
         self.update_thread_select()
         
     def current_data(self):
+        """
+        Returns the data which is chosen over the combobox. If nothing chosen than it returns false.
+        """
         if self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toInt()[0] == 0: return False
         return self._data[self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toInt()[0]]
         
@@ -303,6 +311,9 @@ class ProfilerWindow(QMainWindow):
     def change_errorbarchart_tree(self, current, previous=0):
         """
         If selection changed then filter data and draw chart.
+        
+        Signals:
+            * currentItemChanged(QTreeWidgetItem,QTreeWidgetItem) emitted from ErrorbarChartTree
         """
         if current:
             obj = str(current.text(0)).split(" - ")
@@ -320,7 +331,7 @@ class ProfilerWindow(QMainWindow):
             
     def update_errorbarchart_tree(self):
         """
-        Fill TreeWidget with data from cointainer.
+        Fill TreeWidget with data from container.
         """
         names = self.current_data().unique_function_names()
         l = []
@@ -331,6 +342,12 @@ class ProfilerWindow(QMainWindow):
         self.ui.ErrorbarChartTree.addTopLevelItems(l)
         
     def load_raw_data(self):
+        """
+        Loads raw data from given selection in errorbar-chart-widget.
+        
+        Signals:
+            * clicked() emitted from btnRawData
+        """
         if self.current_data() and self.ui.ErrorbarChartTree.selectedItems():
             obj = str(self.ui.ErrorbarChartTree.selectedItems()[0].text(0)).split(" - ")
             test_nr = self.ui.cmbRawData.itemData(self.ui.cmbRawData.currentIndex()).toInt()[0]
@@ -339,6 +356,12 @@ class ProfilerWindow(QMainWindow):
             self.ui.ErrorbarChart.draw(raw_data, yscale=str(self.ui.cmbScale.currentText()))
             
     def recalc_errorbar(self):
+        """
+        Recalc main values for given selection. Exclude values which are out of selected range.
+        
+        Signals:
+            * clicked() emitted from btnRecalc
+        """
         factor = float(self.ui.txtFactor.text())
         
         obj = str(self.ui.ErrorbarChartTree.selectedItems()[0].text(0)).split(" - ")
@@ -358,7 +381,10 @@ class ProfilerWindow(QMainWindow):
     @pyqtSlot(QTreeWidgetItem,QTreeWidgetItem)
     def change_piechart_tree(self, current, previous):
         """
-        If selection changed then filter data and draw chart.    
+        If selection changed then filter data and draw chart.  
+        
+        Signals:
+            * currentItemChanged(QTreeWidgetItem, QTreeWidgetItem) emitted from PieChartTree
         """
         if current:
             topIdx = self.ui.PieChartTree.invisibleRootItem().indexOfChild(current)
@@ -423,7 +449,7 @@ class ProfilerWindow(QMainWindow):
             
     def update_piechart_tree(self):
         """
-        Fill TreeWidget with data from cointainer.
+        Fill TreeWidget with data from container.
         """
         wdg = self.ui.PieChartTree
         l = []

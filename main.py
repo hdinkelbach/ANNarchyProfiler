@@ -22,12 +22,20 @@
 #
 #==============================================================================
 from PyQt4.QtGui import QApplication
-
 from ProfilerWindow import ProfilerWindow
-
 import sys, os
 
+"""
+ANNarchyProfiler is an extension for neuron simulator ANNarchy. This tool help to analyze
+the rim of a script. The data of the profiler will be shown in graph. So it is possible to
+compare different measurements and measurements with different thread count.
 
+Start the tool with following command:
+
+    $ python main.py
+    
+This tool is on github: https://github.com/hdinkelbach/ANNarchyProfiler
+"""
 if __name__ == '__main__': 
     app = QApplication(sys.argv)
     window = ProfilerWindow()

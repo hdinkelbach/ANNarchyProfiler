@@ -30,11 +30,14 @@ import numpy as np
 
 class MatplotlibWidget(QtGui.QWidget):
     """
-    Widget to draw matplotlib figures.
+    A Widget to include matplotlib figures in Qt-Applications.
     """
     def __init__(self, parent=None):
         """
-        Init function. Set layout of widget.
+        Set layout of widget.
+        
+        Arguments:
+            * parent -- parent element of this widget -- default = None
         """
         super(MatplotlibWidget, self).__init__(parent)
 
@@ -46,17 +49,20 @@ class MatplotlibWidget(QtGui.QWidget):
         
     def figure(self):
         """
-        Return the figure/chart of the widget
+        Return matplotlib-figure of the widget.
         """
         return self._figure
 
 class PieChartWidget(MatplotlibWidget):
     """
-     Draws a pie chart as Qt-Widget from data
+    A widget to draw a pie chart from given data.
     """
     def __init__(self, parent=None):
         """
         Init function.
+        
+        Arguments:
+            * parent -- parent element of this widget -- default = None
         """
         super(PieChartWidget,self).__init__(parent)
     
@@ -64,6 +70,11 @@ class PieChartWidget(MatplotlibWidget):
     def draw(self, data, title, percentage):
         """
         Draw pie chart from given data.
+        
+        Arguments:
+            * data (array) -- values to draw
+            * title (str) -- text shown over the chart
+            * percentage (boolean) -- data shown as percentages?
         
         Signals:
             * drawPieChart(PyQt_PyObject) emited from PieChartTree.current_item_changed()
@@ -75,6 +86,7 @@ class PieChartWidget(MatplotlibWidget):
             values.append(float(i[1])*10)
         total = sum(values)
         
+        # set format of output values
         if percentage:
             form = '%1.1f%%'
         else:
@@ -83,7 +95,8 @@ class PieChartWidget(MatplotlibWidget):
         # create an axis
         ax = self._figure.gca()
         ax.clear()
-
+        
+        # draw chart
         ax.pie(values, labels=labels,
                autopct=form, startangle=90,
                radius=0.25, center=(0, 0), frame=True)
@@ -105,24 +118,35 @@ class ErrorbarChartWidget(MatplotlibWidget):
      Draws a errorbar chart as Qt-Widget from data
     """
     def __init__(self, parent=None):
+        """
+        Init function.
+        
+        Arguments:
+            * parent -- parent element of this widget -- default = None
+        """
         super(ErrorbarChartWidget,self).__init__(parent)
         
     def draw(self, values, std_values=0, labels=[], xlabel="test nr.", ylabel="mean_value (in ms)", yscale="linear"):
         """
         Draw errorbar chart from given data.
         
-        params:
-            * values
-            * std_values
+        Arguments:
+            * values (array) -- data values to draw
+            * std_values (array) -- values of the errorbar
+            * label (array) -- values to identify each graph
+            * xlabel (text) -- text shown at x-axis
+            * ylabel (text) -- text shown at y-axis
+            * yscale (text) -- type of y-axis scale (linear/log)
         
         Signals:
             * drawErrorbarChart(PyQt_PyObject,PyQt_PyObject) emited from ErrorbarChartTree.current_item_changed()
         """
         
-
+        # create an axis
         ax = self._figure.gca()
         ax.clear()
         
+        # draw errorbar chart
         for i in range(len(values)):
             lbl = ''
             if len(labels) != 0:
@@ -135,7 +159,8 @@ class ErrorbarChartWidget(MatplotlibWidget):
                 ax.errorbar(x, y, fmt='-o', label=lbl)
             else:
                 ax.errorbar(x, y, yerr=std_values[i], fmt='-o', label=lbl)
-            
+        
+        # add options to the chart
         #ax.set_title('variable, symmetric error')
         ax.set_xlabel(xlabel, fontsize=18)
         ax.set_ylabel(ylabel, fontsize=18)
@@ -144,5 +169,6 @@ class ErrorbarChartWidget(MatplotlibWidget):
         ax.grid(True)
         if len(labels) != 0:
             ax.legend()
-
+        
+        # show graph
         self._canvas.draw()

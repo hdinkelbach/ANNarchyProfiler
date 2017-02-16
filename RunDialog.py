@@ -26,7 +26,15 @@ from PyQt4.QtGui import QDialog, QFileDialog
 from PyQt4.uic import loadUi
 
 class RunDialog(QDialog):
+    """
+    This is a modified Qt-Component. It opens a dialog where your can choose the script to analyse,
+    the path where the scipt will be executete und the data files saved and add some arguments for
+    execution of the script.
+    """
     def __init__(self):
+        """
+        Load design of the dialog window from ui-file and connect buttons with functions.
+        """
         super(self.__class__, self).__init__()
         self.ui = loadUi("RunDialog.ui")
         
@@ -35,6 +43,9 @@ class RunDialog(QDialog):
 
         
     def get_data(self):
+        """
+        Return the input-values of the dialog if submit-button was clicked.
+        """
         self.ui.exec_()
         if(self.result() == self.Accepted):
             return self.ui.txtScript.text(), self.ui.txtPath.text(), self.ui.txtArgs.text()
@@ -42,9 +53,16 @@ class RunDialog(QDialog):
             return '', '', ''
     
     def select_path(self):
+        """
+        Open a FileDialog to choose the execution directory.
+        """
         self.ui.txtPath.setText(QFileDialog.getExistingDirectory(self, 'Select working directory', '.'))
         
     def select_script(self):
+        """
+        Open a FileDialog to choose the script to execute. If a working directory path is set then
+        by default this path will be opened else the path of the profiler.
+        """
         if(self.ui.txtPath.text() != ""):
             path = self.ui.txtPath.text()
         else:
