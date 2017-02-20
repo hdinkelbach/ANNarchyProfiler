@@ -119,6 +119,18 @@ class DataContainer(object):
         """
         return self._num_threads
     
+    def paradigm(self):
+        """
+        Return paradigm
+        """
+        return self._paradigm
+    
+    def key(self):
+        """
+        Return unique key for this container consists of paradigm an number of threads
+        """
+        return self._paradigm + "-" + str(self._num_threads)
+    
     def num_tests(self):
         """
         Return Number of measurements

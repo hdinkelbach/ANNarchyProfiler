@@ -78,16 +78,17 @@ class ProfilerWindow(QMainWindow):
         Arguments:
             * data (DataContainer) -- new data to hold in app
         """
-        if self._data.has_key(data.num_threads()):
+        # Show warning if data for paradigm with same number of threads exists
+        if self._data.has_key(data.key()):
             msg = QMessageBox()
-            msg.setText("Data from the same number of threads is set. Want to overwrite?")
+            msg.setText(data.paradigm() + " with " + str(data.num_threads()) + " threads already exists. Want to overwrite?")
             msg.setIcon(QMessageBox.Warning)
             msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
             msg.setDefaultButton(QMessageBox.Yes)
             if msg.exec_() != QMessageBox.Yes:
                 return
         
-        self._data[data.num_threads()] = data
+        self._data[data.key()] = data
         self.update_cmb_thread()
         self.update_function_select()
         self.update_thread_select()
@@ -96,8 +97,8 @@ class ProfilerWindow(QMainWindow):
         """
         Returns the data which is chosen over the combobox. If nothing chosen than it returns false.
         """
-        if self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toInt()[0] == 0: return False
-        return self._data[self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toInt()[0]]
+        if self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toString() == '': return False
+        return self._data[str(self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toString())]
         
     
     #==============================================================================
@@ -203,7 +204,7 @@ class ProfilerWindow(QMainWindow):
         Signals:
             * currentIndexChanged(int) emitted from cmbThread
         """
-        if self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toInt()[1]:
+        if self.current_data():
             self.update_piechart_tree()
             self.update_errorbarchart_tree()
     
@@ -213,7 +214,10 @@ class ProfilerWindow(QMainWindow):
         """
         self.ui.cmbThread.clear()
         for key in self._data:
-            self.ui.cmbThread.addItem(str(key) + " Threads ", key)
+            splitted = key.split("-")
+            thread_count = splitted[1]
+            paradigm = splitted[0]
+            self.ui.cmbThread.addItem(paradigm + " - " + thread_count + " Threads ", key)
     
     
     #==============================================================================
@@ -237,7 +241,7 @@ class ProfilerWindow(QMainWindow):
         idx = []
         for i in range(root.childCount()):
             if root.child(i).checkState(0) == Qt.Checked:
-                idx.append(self.ui.cmbThread.itemData(i).toInt()[0])
+                idx.append(str(self.ui.cmbThread.itemData(i).toString()))
         
         if len(idx) == 0:
             return
@@ -257,25 +261,26 @@ class ProfilerWindow(QMainWindow):
         else:
             self.ui.MultiThreadChart.draw(mean_values, labels=labels, yscale=str(self.ui.cmbScale.currentText()))
         
-        # if no data with 1 thread than exit
-        if self._data.has_key(1) == False:
-            return
+        ### Speedup-Graph ###
         
         mean_values = []
         mean_value = []
         labels = []
-        mean_one_thread = self._data[1].values_each_test(obj[0], obj[1], "mean")
         
         for i in idx:
-            if i != 1:
+            paradigm,thread_count = i.split('-')
+
+            if thread_count != '1' and self._data.has_key(paradigm + '-1'):
+                mean_one_thread = self._data[paradigm + '-1'].values_each_test(obj[0], obj[1], "mean")
                 mean_value = self._data[i].values_each_test(obj[0], obj[1], "mean")
                 for n in range(len(mean_value)):
                     mean_value[n] = mean_one_thread[n] / mean_value[n]
                     
                 mean_values.append(mean_value)
                 labels.append(str(i) + " Threads")
-            
-        self.ui.SpeedupChart.draw(values=mean_values, labels=labels, ylabel="1 Thread / x Threads", yscale=str(self.ui.cmbScale.currentText()))
+        
+        if len(mean_values) != 0:  
+            self.ui.SpeedupChart.draw(values=mean_values, labels=labels, ylabel="1 Thread / x Threads", yscale=str(self.ui.cmbScale.currentText()))
         
     def update_function_select(self):
         """
