@@ -21,9 +21,10 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #==============================================================================
+import sys
+
 from PyQt4.QtGui import QApplication
 from ProfilerWindow import ProfilerWindow
-import sys, os
 
 """
 ANNarchyProfiler is an extension for neuron simulator ANNarchy. This tool help to analyze
@@ -33,11 +34,12 @@ compare different measurements and measurements with different thread count.
 Start the tool with following command:
 
     $ python main.py
-    
+
 This tool is on github: https://github.com/hdinkelbach/ANNarchyProfiler
 """
-if __name__ == '__main__': 
+if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = ProfilerWindow()
     window.show()
-    app.exec_() 
+    app.exec_()
+    

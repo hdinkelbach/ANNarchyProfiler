@@ -27,6 +27,7 @@ from PyQt4.uic import loadUi
 
 from DataContainer import DataContainer
 from RunDialog import RunDialog
+from Charts import MatplotlibWidget
 
 class ProfilerWindow(QMainWindow):
     """
@@ -58,8 +59,8 @@ class ProfilerWindow(QMainWindow):
         self.ui.chkStdValues.stateChanged.connect(self.change_std_state)
         
         # action button
-        self.ui.btnRawData.clicked.connect(self.load_raw_data)
-        self.ui.btnRecalc.clicked.connect(self.recalc_errorbar)
+        self.ui.btnRawData.clicked.connect(self.click_raw_data)
+        self.ui.btnRecalc.clicked.connect(self.click_recalc_errorbar)
         
         # set class variables 
         self._data = {}
@@ -349,7 +350,7 @@ class ProfilerWindow(QMainWindow):
         self.ui.ErrorbarChartTree.clear()
         self.ui.ErrorbarChartTree.addTopLevelItems(l)
         
-    def load_raw_data(self):
+    def click_raw_data(self):
         """
         Loads raw data from given selection in errorbar-chart-widget.
         
@@ -363,7 +364,7 @@ class ProfilerWindow(QMainWindow):
             
             self.ui.ErrorbarChart.draw(raw_data, yscale=str(self.ui.cmbScale.currentText()))
             
-    def recalc_errorbar(self):
+    def click_recalc_errorbar(self):
         """
         Recalc main values for given selection. Exclude values which are out of selected range.
         

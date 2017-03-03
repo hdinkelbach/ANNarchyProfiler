@@ -98,7 +98,7 @@ class DataContainer(object):
             raw = self._convert_string_to_array(dataset.find("raw_data").text)
             
             if obj_type == "net":
-                if func == "neur_step": # Check for first element of network
+                if func == "neur_step":  # Check for first element of network
                     num_tests += 1
                     self._data[num_tests] = {"net" : {}, "pop" : {}, "proj" : {}}
                 self._data[num_tests][obj_type][func] = {"mean" : mean, "std" : std, "raw" :  raw}
@@ -150,7 +150,7 @@ class DataContainer(object):
             return self._data[index][obj_type][func]
         else:
             values = {}
-            for key,value in self._data[index][obj_type].items():
+            for key, value in self._data[index][obj_type].items():
                 values[key] = value[func]
         return values
     
@@ -173,11 +173,11 @@ class DataContainer(object):
         for func in self._data[0]["net"]:
             names.append("net - " + func)
             
-        for nr,values in self._data[0]["pop"].items():
+        for nr, values in self._data[0]["pop"].items():
             for func in values:
                 names.append("pop" + str(nr) + " - " + func)
         
-        for nr,values in self._data[0]["proj"].items():
+        for nr, values in self._data[0]["proj"].items():
             for func in values:
                 names.append("proj" + str(nr) + " - " + func)
             
@@ -195,11 +195,11 @@ class DataContainer(object):
         values = []
         
         if obj_type == "net":
-            for _,value in self._data.items():
+            for _, value in self._data.items():
                 values.append(value[obj_type][func][val_type])
         else:
             match = re.match(r"([a-z]+)([0-9]+)", obj_type, re.I).groups()
-            for _,value in self._data.items():
+            for _, value in self._data.items():
                 values.append(value[match[0]][int(match[1])][func][val_type])
             
         return values
@@ -222,7 +222,7 @@ class DataContainer(object):
             sum = 0
             count = 0
             for n in xrange(len(raw_data[i])):
-                if raw_data[i][n] <= (mean_values[i] + factor*std_values[i]) and raw_data[i][n] >= (mean_values[i] - factor*std_values[i]):
+                if raw_data[i][n] <= (mean_values[i] + factor * std_values[i]) and raw_data[i][n] >= (mean_values[i] - factor * std_values[i]):
                     count += 1
                     sum += raw_data[i][n]
             mean_values[i] = sum / count
