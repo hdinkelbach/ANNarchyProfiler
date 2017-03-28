@@ -38,6 +38,7 @@ class DataContainer(object):
         self._num_threads = 0
         
         # performance data
+        # [obj_type][name][func]
         self._data = {}
 
     def _convert_string_to_array(self, strng):
@@ -97,17 +98,13 @@ class DataContainer(object):
             std = float(dataset.find("std").text)
             raw = self._convert_string_to_array(dataset.find("raw_data").text)
             
-            if obj_type == "net":
-                if func == "neur_step":  # Check for first element of network
-                    num_tests += 1
-                    self._data[num_tests] = {"net" : {}, "pop" : {}, "proj" : {}}
-                self._data[num_tests][obj_type][func] = {"mean" : mean, "std" : std, "raw" :  raw}
+            if obj_type == "net" and func == "neur_step": # Check for first element of network
+                num_tests += 1
+                self._data[num_tests] = {"net" : {}, "pop" : {}, "proj" : {}}
             
-            elif obj_type == "pop" or obj_type == "proj":
-                num = int(re.findall("\d+", name)[0])
-                if not self._data[num_tests][obj_type].has_key(num):
-                    self._data[num_tests][obj_type][num] = {}
-                self._data[num_tests][obj_type][num][func] = {"mean" : mean, "std" : std, "raw" :  raw}
+            if not name in self._data[num_tests][obj_type]:
+                self._data[num_tests][obj_type][name] = {}
+            self._data[num_tests][obj_type][name][func] = {"mean" : mean, "std" : std, "raw" :  raw}
                 
         self._num_tests = num_tests + 1
         
@@ -146,12 +143,9 @@ class DataContainer(object):
             * obj_type - name of the object (net/pop/proj)
             * func - name of the function to filter
         """
-        if obj_type == "net":
-            return self._data[index][obj_type][func]
-        else:
-            values = {}
-            for key, value in self._data[index][obj_type].items():
-                values[key] = value[func]
+        values = {}
+        for key, value in self._data[index][obj_type].items():
+            values[key] = value[func]
         return values
     
     def values_by_type(self, index, obj_type):
@@ -164,47 +158,41 @@ class DataContainer(object):
         """
         return self._data[index][obj_type]
     
-    def unique_function_names(self):
+    def unique_function_names(self, obj_type):
         """
-        Return the names of all defined functions
+        Return the names of all defined functions for a object type
         """
         names = []
-
-        for func in self._data[0]["net"]:
-            names.append("net - " + func)
-            
-        for nr, values in self._data[0]["pop"].items():
-            for func in values:
-                names.append("pop" + str(nr) + " - " + func)
         
-        for nr, values in self._data[0]["proj"].items():
-            for func in values:
-                names.append("proj" + str(nr) + " - " + func)
+        for name, name_val in self._data[0][obj_type].items():
+            for func_name in name_val:
+                names.append(name + " - " + func_name)
             
         return names
     
-    def values_each_test(self, obj_type, func, val_type):
+    def values_each_test(self, obj_type, name, func, val_type):
         """
         Filter values by object type, function and values type
         
         Arguments:
             * obj_type -- Network(net), Projection(proj) or Population(pop)
+            * name -- name of the object
             * func -- name of function to filter
             * val_type -- mean, std or raw data
         """
         values = []
         
-        if obj_type == "net":
-            for _, value in self._data.items():
-                values.append(value[obj_type][func][val_type])
-        else:
-            match = re.match(r"([a-z]+)([0-9]+)", obj_type, re.I).groups()
-            for _, value in self._data.items():
-                values.append(value[match[0]][int(match[1])][func][val_type])
+        #if obj_type == "net":
+        for _, value in self._data.items():
+            values.append(value[obj_type][name][func][val_type])
+        #else:
+            #match = re.match(r"([a-z]+)([0-9]+)", obj_type, re.I).groups()
+            #for _, value in self._data.items():
+                #values.append(value[match[0]][int(match[1])][func][val_type])
             
         return values
     
-    def recalc_mean_values(self, obj_type, func, factor):
+    def recalc_mean_values(self, obj_type, name, func, factor):
         """
         Filter values by object type, function and recalculate the mean values.
         
@@ -214,9 +202,9 @@ class DataContainer(object):
             * factor -- 
         """
         
-        mean_values = self.values_each_test(obj_type, func, "mean")
-        std_values = self.values_each_test(obj_type, func, "std")
-        raw_data = self.values_each_test(obj_type, func, "raw")
+        mean_values = self.values_each_test(obj_type, name, func, "mean")
+        std_values = self.values_each_test(obj_type, name, func, "std")
+        raw_data = self.values_each_test(obj_type, name, func, "raw")
         
         for i in xrange(len(mean_values)):
             sum = 0

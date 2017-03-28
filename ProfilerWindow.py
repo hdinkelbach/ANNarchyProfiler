@@ -238,59 +238,89 @@ class ProfilerWindow(QMainWindow):
         if len(current) == 0:
             return
         
-        root = self.ui.ThreadSelectTree.invisibleRootItem()
-        idx = []
-        for i in range(root.childCount()):
-            if root.child(i).checkState(0) == Qt.Checked:
-                idx.append(str(self.ui.cmbThread.itemData(i).toString()))
+        current = current[0]
         
-        if len(idx) == 0:
-            return
+        # Check if child element is selected
+        parentIdx = self.ui.FunctionSelectTree.invisibleRootItem().indexOfChild(current)
+        if parentIdx == -1:
+            parentIdx = current.parent().indexOfChild(current)
+            parentIdx = self.ui.FunctionSelectTree.invisibleRootItem().indexOfChild(current.parent())
         
-        mean_values = []
-        std_values = []
-        labels = []
-        
-        obj = str(current[0].text(0)).split(" - ")
-        for i in idx:
-            mean_values.append(self._data[i].values_each_test(obj[0], obj[1], "mean"))
-            std_values.append(self._data[i].values_each_test(obj[0], obj[1], "std"))
-            labels.append(str(i) + " Threads")
-        
-        if self.ui.chkStdValues.isChecked():
-            self.ui.MultiThreadChart.draw(mean_values, std_values, labels, yscale=str(self.ui.cmbScale.currentText()))
-        else:
-            self.ui.MultiThreadChart.draw(mean_values, labels=labels, yscale=str(self.ui.cmbScale.currentText()))
-        
-        ### Speedup-Graph ###
-        
-        mean_values = []
-        mean_value = []
-        labels = []
-        
-        for i in idx:
-            paradigm,thread_count = i.split('-')
-
-            if thread_count != '1' and self._data.has_key(paradigm + '-1'):
-                mean_one_thread = self._data[paradigm + '-1'].values_each_test(obj[0], obj[1], "mean")
-                mean_value = self._data[i].values_each_test(obj[0], obj[1], "mean")
-                for n in range(len(mean_value)):
-                    mean_value[n] = mean_one_thread[n] / mean_value[n]
-                    
-                mean_values.append(mean_value)
+            if parentIdx == 0: obj_type = "net"
+            elif parentIdx == 1: obj_type = "pop"
+            elif parentIdx == 2: obj_type = "proj"
+    
+            root = self.ui.ThreadSelectTree.invisibleRootItem()
+            idx = []
+            for i in range(root.childCount()):
+                if root.child(i).checkState(0) == Qt.Checked:
+                    idx.append(str(self.ui.cmbThread.itemData(i).toString()))
+            
+            if len(idx) == 0:
+                return
+            
+            mean_values = []
+            std_values = []
+            labels = []
+            
+            obj = str(current.text(0)).split(" - ")
+            for i in idx:
+                mean_values.append(self._data[i].values_each_test(obj_type, obj[0], obj[1], "mean"))
+                std_values.append(self._data[i].values_each_test(obj_type, obj[0], obj[1], "std"))
                 labels.append(str(i) + " Threads")
-        
-        if len(mean_values) != 0:  
-            self.ui.SpeedupChart.draw(values=mean_values, labels=labels, ylabel="1 Thread / x Threads", yscale=str(self.ui.cmbScale.currentText()))
-        
+            
+            if self.ui.chkStdValues.isChecked():
+                self.ui.MultiThreadChart.draw(mean_values, std_values, labels, yscale=str(self.ui.cmbScale.currentText()))
+            else:
+                self.ui.MultiThreadChart.draw(mean_values, labels=labels, yscale=str(self.ui.cmbScale.currentText()))
+            
+            ### Speedup-Graph ###
+            
+            mean_values = []
+            mean_value = []
+            labels = []
+            
+            for i in idx:
+                paradigm,thread_count = i.split('-')
+    
+                if thread_count != '1' and self._data.has_key(paradigm + '-1'):
+                    mean_one_thread = self._data[paradigm + '-1'].values_each_test(obj_type, obj[0], obj[1], "mean")
+                    mean_value = self._data[i].values_each_test(obj_type, obj[0], obj[1], "mean")
+                    for n in range(len(mean_value)):
+                        mean_value[n] = mean_one_thread[n] / mean_value[n]
+                        
+                    mean_values.append(mean_value)
+                    labels.append(str(i) + " Threads")
+            
+            if len(mean_values) != 0:  
+                self.ui.SpeedupChart.draw(values=mean_values, labels=labels, ylabel="1 Thread / x Threads", yscale=str(self.ui.cmbScale.currentText()))
+            
     def update_function_select(self):
         """
         Load no data in FunctionSelectTree if new file was added
         """
-        names = self.current_data().unique_function_names()
         l = []
+        
+        # names for network
+        names = self.current_data().unique_function_names("net")
+        item = QTreeWidgetItem(["Network"])
         for name in names:
-            l.append(QTreeWidgetItem([name]))
+            item.addChild(QTreeWidgetItem([name]))
+        l.append(item)
+        
+        # names for population
+        names = self.current_data().unique_function_names("pop")
+        item = QTreeWidgetItem(["Population"])
+        for name in names:
+            item.addChild(QTreeWidgetItem([name]))
+        l.append(item)
+        
+        # names for projection
+        names = self.current_data().unique_function_names("proj")
+        item = QTreeWidgetItem(["Projection"])
+        for name in names:
+            item.addChild(QTreeWidgetItem([name]))
+        l.append(item)
         
         self.ui.FunctionSelectTree.clear()
         self.ui.FunctionSelectTree.addTopLevelItems(l)
@@ -325,27 +355,54 @@ class ProfilerWindow(QMainWindow):
             * currentItemChanged(QTreeWidgetItem,QTreeWidgetItem) emitted from ErrorbarChartTree
         """
         if current:
-            obj = str(current.text(0)).split(" - ")
-            mean_values = [self.current_data().values_each_test(obj[0], obj[1], "mean")]
-            std_values = [self.current_data().values_each_test(obj[0], obj[1], "std")]
+            idx = self.ui.ErrorbarChartTree.invisibleRootItem().indexOfChild(current)
+            if idx == -1: # not top element?
+                idx = current.parent().indexOfChild(current)
+                parentIdx = self.ui.ErrorbarChartTree.invisibleRootItem().indexOfChild(current.parent())
             
-            if self.ui.chkStdValues.isChecked():
-                self.ui.ErrorbarChart.draw(mean_values, std_values, yscale=str(self.ui.cmbScale.currentText()))
-            else:
-                self.ui.ErrorbarChart.draw(mean_values, yscale=str(self.ui.cmbScale.currentText()))
+                if parentIdx == 0: obj_type = "net"
+                elif parentIdx == 1: obj_type = "pop"
+                elif parentIdx == 2: obj_type = "proj"
+                
+                obj = str(current.text(0)).split(" - ")
+                mean_values = [self.current_data().values_each_test(obj_type, obj[0], obj[1], "mean")]
+                std_values = [self.current_data().values_each_test(obj_type, obj[0], obj[1], "std")]
             
-            self.ui.cmbRawData.clear()
-            for i in xrange(self.current_data().num_tests()):
-                self.ui.cmbRawData.addItem("Test " + str(i), i)
+                if self.ui.chkStdValues.isChecked():
+                    self.ui.ErrorbarChart.draw(mean_values, std_values, yscale=str(self.ui.cmbScale.currentText()))
+                else:
+                    self.ui.ErrorbarChart.draw(mean_values, yscale=str(self.ui.cmbScale.currentText()))
+            
+                self.ui.cmbRawData.clear()
+                for i in xrange(self.current_data().num_tests()):
+                    self.ui.cmbRawData.addItem("Test " + str(i), i)
             
     def update_errorbarchart_tree(self):
         """
         Fill TreeWidget with data from container.
         """
-        names = self.current_data().unique_function_names()
         l = []
+        
+        # names for network
+        names = self.current_data().unique_function_names("net")
+        item = QTreeWidgetItem(["Network"])
         for name in names:
-            l.append(QTreeWidgetItem([name]))
+            item.addChild(QTreeWidgetItem([name]))
+        l.append(item)
+        
+        # names for population
+        names = self.current_data().unique_function_names("pop")
+        item = QTreeWidgetItem(["Population"])
+        for name in names:
+            item.addChild(QTreeWidgetItem([name]))
+        l.append(item)
+        
+        # names for projection
+        names = self.current_data().unique_function_names("proj")
+        item = QTreeWidgetItem(["Projection"])
+        for name in names:
+            item.addChild(QTreeWidgetItem([name]))
+        l.append(item)
         
         self.ui.ErrorbarChartTree.clear()
         self.ui.ErrorbarChartTree.addTopLevelItems(l)
@@ -358,11 +415,22 @@ class ProfilerWindow(QMainWindow):
             * clicked() emitted from btnRawData
         """
         if self.current_data() and self.ui.ErrorbarChartTree.selectedItems():
-            obj = str(self.ui.ErrorbarChartTree.selectedItems()[0].text(0)).split(" - ")
-            test_nr = self.ui.cmbRawData.itemData(self.ui.cmbRawData.currentIndex()).toInt()[0]
-            raw_data = [self.current_data().values_each_test(obj[0], obj[1], "raw")[test_nr]]
             
-            self.ui.ErrorbarChart.draw(raw_data, yscale=str(self.ui.cmbScale.currentText()))
+            current = self.ui.ErrorbarChartTree.selectedItems()[0]
+            idx = self.ui.ErrorbarChartTree.invisibleRootItem().indexOfChild(current)
+            if idx == -1: # not top element?
+                idx = current.parent().indexOfChild(current)
+                parentIdx = self.ui.ErrorbarChartTree.invisibleRootItem().indexOfChild(current.parent())
+            
+                if parentIdx == 0: obj_type = "net"
+                elif parentIdx == 1: obj_type = "pop"
+                elif parentIdx == 2: obj_type = "proj"
+                
+                obj = str(self.ui.ErrorbarChartTree.selectedItems()[0].text(0)).split(" - ")
+                test_nr = self.ui.cmbRawData.itemData(self.ui.cmbRawData.currentIndex()).toInt()[0]
+                raw_data = [self.current_data().values_each_test(obj_type, obj[0], obj[1], "raw")[test_nr]]
+            
+                self.ui.ErrorbarChart.draw(raw_data, yscale=str(self.ui.cmbScale.currentText()))
             
     def click_recalc_errorbar(self):
         """
@@ -371,16 +439,28 @@ class ProfilerWindow(QMainWindow):
         Signals:
             * clicked() emitted from btnRecalc
         """
-        factor = float(self.ui.txtFactor.text())
+        if self.current_data() and self.ui.ErrorbarChartTree.selectedItems():
+            
+            current = self.ui.ErrorbarChartTree.selectedItems()[0]
+            idx = self.ui.ErrorbarChartTree.invisibleRootItem().indexOfChild(current)
+            if idx == -1: # not top element?
+                idx = current.parent().indexOfChild(current)
+                parentIdx = self.ui.ErrorbarChartTree.invisibleRootItem().indexOfChild(current.parent())
+            
+                if parentIdx == 0: obj_type = "net"
+                elif parentIdx == 1: obj_type = "pop"
+                elif parentIdx == 2: obj_type = "proj"
         
-        obj = str(self.ui.ErrorbarChartTree.selectedItems()[0].text(0)).split(" - ")
-        mean_values = [self.current_data().recalc_mean_values(obj[0], obj[1], factor)]
-        std_values = [self.current_data().values_each_test(obj[0], obj[1], "std")]
-        
-        if self.ui.chkStdValues.isChecked():
-            self.ui.ErrorbarChart.draw(mean_values, std_values, yscale=str(self.ui.cmbScale.currentText()))
-        else:
-            self.ui.ErrorbarChart.draw(mean_values, yscale=str(self.ui.cmbScale.currentText()))
+                factor = float(self.ui.txtFactor.text())
+                
+                obj = str(self.ui.ErrorbarChartTree.selectedItems()[0].text(0)).split(" - ")
+                mean_values = [self.current_data().recalc_mean_values(obj_type, obj[0], obj[1], factor)]
+                std_values = [self.current_data().values_each_test(obj_type, obj[0], obj[1], "std")]
+                
+                if self.ui.chkStdValues.isChecked():
+                    self.ui.ErrorbarChart.draw(mean_values, std_values, yscale=str(self.ui.cmbScale.currentText()))
+                else:
+                    self.ui.ErrorbarChart.draw(mean_values, yscale=str(self.ui.cmbScale.currentText()))
             
     
     #==============================================================================
@@ -401,13 +481,13 @@ class ProfilerWindow(QMainWindow):
                 values = self.current_data().values_by_type(topIdx, "net")
                 
                 # net-step = overhead + net-proj_step + net-psp + net-neur_step
-                overhead = values["step"]["mean"] - (values["proj_step"]["mean"] + values["psp"]["mean"] + values["neur_step"]["mean"])
+                overhead = values[values.keys()[0]]["step"]["mean"] - (values[values.keys()[0]]["proj_step"]["mean"] + values[values.keys()[0]]["psp"]["mean"] + values[values.keys()[0]]["neur_step"]["mean"])
                     
                 data = [
                         ["Overhead\n(" + "%.4f" % overhead + ")", "%.4f" % overhead],
-                        ["proj_step\n(" + "%.4f" % values["proj_step"]["mean"] + ")", "%.4f" % values["proj_step"]["mean"]],
-                        ["psp\n(" + "%.4f" % values["psp"]["mean"] + ")", "%.4f" % values["psp"]["mean"]],
-                        ["neur_step\n(" + "%.4f" % values["neur_step"]["mean"] + ")", "%.4f" % values["neur_step"]["mean"]]
+                        ["proj_step\n(" + "%.4f" % values[values.keys()[0]]["proj_step"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["proj_step"]["mean"]],
+                        ["psp\n(" + "%.4f" % values[values.keys()[0]]["psp"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["psp"]["mean"]],
+                        ["neur_step\n(" + "%.4f" % values[values.keys()[0]]["neur_step"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["neur_step"]["mean"]]
                     ]
                 self.ui.PieChart.draw(data, current.text(0) + " (in ms)", True)
             else:
@@ -417,6 +497,7 @@ class ProfilerWindow(QMainWindow):
                     
                     if childIdx == 0:
                         neur_step = self.current_data().values_by_function(topIdx, "net", "neur_step")
+                        neur_step = neur_step[neur_step.keys()[0]]
                         func_data = self.current_data().values_by_function(topIdx, "pop", "step")
     
                         overhead = neur_step["mean"]
@@ -430,6 +511,7 @@ class ProfilerWindow(QMainWindow):
                         
                     if childIdx == 1:
                         proj_step = self.current_data().values_by_function(topIdx, "net", "proj_step")
+                        proj_step = proj_step[proj_step.keys()[0]]
                         func_data = self.current_data().values_by_function(topIdx, "proj", "step")
     
                         overhead = proj_step["mean"]
@@ -443,6 +525,7 @@ class ProfilerWindow(QMainWindow):
                         
                     if childIdx == 2:
                         net_psp = self.current_data().values_by_function(topIdx, "net", "psp")
+                        net_psp = net_psp[net_psp.keys()[0]]
                         func_data = self.current_data().values_by_function(topIdx, "proj", "psp")
     
                         overhead = net_psp["mean"]
