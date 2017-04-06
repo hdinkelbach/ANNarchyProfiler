@@ -505,7 +505,7 @@ class ProfilerWindow(QMainWindow):
                         for key,value in func_data.items():
     
                             overhead -= value["mean"]
-                            values.append(["pop" + str(key), "%.4f" % value["mean"]])
+                            values.append([str(key), "%.4f" % value["mean"]])
                         
                         values.append(["overhead", "%.4f" % overhead])
                         
@@ -519,7 +519,7 @@ class ProfilerWindow(QMainWindow):
                         for key,value in func_data.items():
     
                             overhead -= value["mean"]
-                            values.append(["proj" + str(key), "%.4f" % value["mean"]])
+                            values.append([str(key), "%.4f" % value["mean"]])
                         
                         values.append(["overhead", "%.4f" % overhead])
                         
@@ -533,7 +533,7 @@ class ProfilerWindow(QMainWindow):
                         for key,value in func_data.items():
     
                             overhead -= value["mean"]
-                            values.append(["proj" + str(key), "%.4f" % value["mean"]])
+                            values.append([str(key), "%.4f" % value["mean"]])
                         
                         values.append(["overhead", "%.4f" % overhead])
                     
