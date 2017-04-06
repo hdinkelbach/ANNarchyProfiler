@@ -494,50 +494,53 @@ class ProfilerWindow(QMainWindow):
                 childIdx = current.parent().indexOfChild(current)
                 topIdx = self.ui.PieChartTree.invisibleRootItem().indexOfChild(current.parent())
                 if topIdx != -1: # First child of Network?
+                    try:
+                        if childIdx == 0:
+                            neur_step = self.current_data().values_by_function(topIdx, "net", "neur_step")
+                            neur_step = neur_step[neur_step.keys()[0]]
+                            func_data = self.current_data().values_by_function(topIdx, "pop", "step")
+        
+                            overhead = neur_step["mean"]
+                            values = []
+                            for key,value in func_data.items():
+        
+                                overhead -= value["mean"]
+                                values.append([str(key), "%.4f" % value["mean"]])
+                            
+                            values.append(["overhead", "%.4f" % overhead])
+                            
+                        if childIdx == 1:
+                            proj_step = self.current_data().values_by_function(topIdx, "net", "proj_step")
+                            proj_step = proj_step[proj_step.keys()[0]]
+                            func_data = self.current_data().values_by_function(topIdx, "proj", "step")
+        
+                            overhead = proj_step["mean"]
+                            values = []
+                            for key,value in func_data.items():
+        
+                                overhead -= value["mean"]
+                                values.append([str(key), "%.4f" % value["mean"]])
+                            
+                            values.append(["overhead", "%.4f" % overhead])
+                            
+                        if childIdx == 2:
+                            net_psp = self.current_data().values_by_function(topIdx, "net", "psp")
+                            net_psp = net_psp[net_psp.keys()[0]]
+                            func_data = self.current_data().values_by_function(topIdx, "proj", "psp")
+        
+                            overhead = net_psp["mean"]
+                            values = []
+                            for key,value in func_data.items():
+        
+                                overhead -= value["mean"]
+                                values.append([str(key), "%.4f" % value["mean"]])
+                            
+                            values.append(["overhead", "%.4f" % overhead])
+                        
+                        self.ui.PieChart.draw(values, current.text(0) + " (in ms)", False)
                     
-                    if childIdx == 0:
-                        neur_step = self.current_data().values_by_function(topIdx, "net", "neur_step")
-                        neur_step = neur_step[neur_step.keys()[0]]
-                        func_data = self.current_data().values_by_function(topIdx, "pop", "step")
-    
-                        overhead = neur_step["mean"]
-                        values = []
-                        for key,value in func_data.items():
-    
-                            overhead -= value["mean"]
-                            values.append([str(key), "%.4f" % value["mean"]])
-                        
-                        values.append(["overhead", "%.4f" % overhead])
-                        
-                    if childIdx == 1:
-                        proj_step = self.current_data().values_by_function(topIdx, "net", "proj_step")
-                        proj_step = proj_step[proj_step.keys()[0]]
-                        func_data = self.current_data().values_by_function(topIdx, "proj", "step")
-    
-                        overhead = proj_step["mean"]
-                        values = []
-                        for key,value in func_data.items():
-    
-                            overhead -= value["mean"]
-                            values.append([str(key), "%.4f" % value["mean"]])
-                        
-                        values.append(["overhead", "%.4f" % overhead])
-                        
-                    if childIdx == 2:
-                        net_psp = self.current_data().values_by_function(topIdx, "net", "psp")
-                        net_psp = net_psp[net_psp.keys()[0]]
-                        func_data = self.current_data().values_by_function(topIdx, "proj", "psp")
-    
-                        overhead = net_psp["mean"]
-                        values = []
-                        for key,value in func_data.items():
-    
-                            overhead -= value["mean"]
-                            values.append([str(key), "%.4f" % value["mean"]])
-                        
-                        values.append(["overhead", "%.4f" % overhead])
-                    
-                    self.ui.PieChart.draw(values, current.text(0) + " (in ms)", False)
+                    except IndexError:
+                        self.ui.PieChart.clear()
             
     def update_piechart_tree(self):
         """

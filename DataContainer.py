@@ -145,7 +145,8 @@ class DataContainer(object):
         """
         values = {}
         for key, value in self._data[index][obj_type].items():
-            values[key] = value[func]
+            if func in value:
+                values[key] = value[func]
         return values
     
     def values_by_type(self, index, obj_type):

@@ -52,6 +52,14 @@ class MatplotlibWidget(QtGui.QWidget):
         Return matplotlib-figure of the widget.
         """
         return self._figure
+    
+    def clear(self):
+        """
+        Clear the chart.
+        """
+        # create an axis
+        self._figure.clf()
+        self._canvas.draw()
 
 class PieChartWidget(MatplotlibWidget):
     """
