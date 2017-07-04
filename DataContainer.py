@@ -36,6 +36,7 @@ class DataContainer(object):
         # performance config
         self._paradigm = ''
         self._num_threads = 0
+        self._rank = ''
         
         # performance data
         # [obj_type][name][func]
@@ -79,6 +80,9 @@ class DataContainer(object):
  
                 if child.tag == "num_threads":
                     self._num_threads = int(child.text)
+                    
+                if child.tag == "rank":
+                    self._rank = child.text
         
         # no config-data -> import fails
         if self._num_threads == 0 or self._paradigm == '':
@@ -124,9 +128,9 @@ class DataContainer(object):
     
     def key(self):
         """
-        Return unique key for this container consists of paradigm an number of threads
+        Return unique key for this container consists of paradigm, rank and number of threads
         """
-        return self._paradigm + "-" + str(self._num_threads)
+        return self._paradigm + self._rank + "-" + str(self._num_threads)
     
     def num_tests(self):
         """
