@@ -480,15 +480,27 @@ class ProfilerWindow(QMainWindow):
             if topIdx != -1: # top element? (Network)
                 values = self.current_data().values_by_type(topIdx, "net")
                 
+                # Check if values for proj_step exists because its optional
                 # net-step = overhead + net-proj_step + net-psp + net-neur_step
-                overhead = values[values.keys()[0]]["step"]["mean"] - (values[values.keys()[0]]["proj_step"]["mean"] + values[values.keys()[0]]["psp"]["mean"] + values[values.keys()[0]]["neur_step"]["mean"])
+                if values[values.keys()[0]].has_key('proj_step'):
+                    overhead = values[values.keys()[0]]["step"]["mean"] - ( values[values.keys()[0]]["proj_step"]["mean"] + values[values.keys()[0]]["psp"]["mean"] + values[values.keys()[0]]["neur_step"]["mean"])
                     
-                data = [
+                    data = [
                         ["Overhead\n(" + "%.4f" % overhead + ")", "%.4f" % overhead],
                         ["proj_step\n(" + "%.4f" % values[values.keys()[0]]["proj_step"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["proj_step"]["mean"]],
                         ["psp\n(" + "%.4f" % values[values.keys()[0]]["psp"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["psp"]["mean"]],
                         ["neur_step\n(" + "%.4f" % values[values.keys()[0]]["neur_step"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["neur_step"]["mean"]]
-                    ]
+                    ]   
+                else:
+                    overhead = values[values.keys()[0]]["step"]["mean"] - ( values[values.keys()[0]]["psp"]["mean"] + values[values.keys()[0]]["neur_step"]["mean"])
+                    
+                    data = [
+                        ["Overhead\n(" + "%.4f" % overhead + ")", "%.4f" % overhead],
+                        ["psp\n(" + "%.4f" % values[values.keys()[0]]["psp"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["psp"]["mean"]],
+                        ["neur_step\n(" + "%.4f" % values[values.keys()[0]]["neur_step"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["neur_step"]["mean"]]
+                    ] 
+                    
+               
                 self.ui.PieChart.draw(data, current.text(0) + " (in ms)", True)
             else:
                 childIdx = current.parent().indexOfChild(current)
