@@ -1,4 +1,4 @@
-#==============================================================================
+# ==============================================================================
 #
 #     Charts.py
 #
@@ -20,13 +20,14 @@
 #     You should have received a copy of the GNU General Public License
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#==============================================================================
+# ==============================================================================
 from PyQt4 import QtGui, QtCore
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 
 import numpy as np
+
 
 class MatplotlibWidget(QtGui.QWidget):
     """

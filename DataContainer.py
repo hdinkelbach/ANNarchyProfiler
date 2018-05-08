@@ -1,4 +1,4 @@
-#==============================================================================
+# ==============================================================================
 #
 #     DataContainer.py
 #
@@ -20,9 +20,10 @@
 #     You should have received a copy of the GNU General Public License
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#==============================================================================
+# ==============================================================================
 from lxml import etree
 import re
+
 
 class DataContainer(object):
     """
@@ -37,6 +38,7 @@ class DataContainer(object):
         self._paradigm = ''
         self._num_threads = 0
         self._rank = ''
+        self._num_tests = 0
         
         # performance data
         # [obj_type][name][func]
@@ -65,16 +67,20 @@ class DataContainer(object):
         Load performance data from provided file. Returns true if successful else false.
  
         Arguments:
+
             * fname -- absolute path and name of the file.
         """
         doc = etree.parse(str(fname))
  
         # save configuration from
-        matches = doc.findall('config')
-        for config in matches:
-            childs = config.getchildren()
+        config_nodes = doc.findall('config')
+        if config_nodes == []:
+            print("No configuration entries in XML ...")
+
+        for config in config_nodes:
+            children = config.getchildren()
  
-            for child in childs:
+            for child in children:
                 if child.tag == "paradigm":
                     self._paradigm = child.text
  
@@ -84,11 +90,15 @@ class DataContainer(object):
                 if child.tag == "rank":
                     self._rank = child.text
         
-        # no config-data -> import fails
-        if self._num_threads == 0 or self._paradigm == '':
-            return False;
-        
-        # performance data
+        # Configuration validation
+        if self._paradigm == '':
+            return False
+        if self._paradigm == "openmp" and self._num_threads == 0:
+            return False
+        if self._paradigm == "cuda":
+            self._num_threads = 32
+
+        # Scan performance data
         matches = doc.findall('dataset')
         
         self._data = {}
@@ -112,7 +122,7 @@ class DataContainer(object):
                 
         self._num_tests = num_tests + 1
         
-        return True;
+        return True
     
     def num_threads(self):
         """

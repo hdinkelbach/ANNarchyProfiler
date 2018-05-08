@@ -1,4 +1,4 @@
-#==============================================================================
+# ==============================================================================
 #
 #     ProfilerWindow.py
 #
@@ -20,7 +20,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#==============================================================================
+# ==============================================================================
 from PyQt4.QtCore import pyqtSlot, Qt, SIGNAL
 from PyQt4.QtGui import QErrorMessage, QFileDialog, QMainWindow, QMessageBox, QTreeWidgetItem
 from PyQt4.uic import loadUi
@@ -28,6 +28,7 @@ from PyQt4.uic import loadUi
 from DataContainer import DataContainer
 from RunDialog import RunDialog
 from Charts import MatplotlibWidget
+
 
 class ProfilerWindow(QMainWindow):
     """
@@ -100,12 +101,11 @@ class ProfilerWindow(QMainWindow):
         """
         if self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toString() == '': return False
         return self._data[str(self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toString())]
-        
-    
-    #==============================================================================
-    # actions for the buttons in the menubar
-    #==============================================================================
-    
+
+    # ==============================================================================
+    # actions for the buttons in the menu bar
+    # ==============================================================================
+
     @pyqtSlot()    
     def load_data_dialog(self):
         """
@@ -118,7 +118,7 @@ class ProfilerWindow(QMainWindow):
 
         for fname in fnames:
             data = DataContainer()
-            if data.load_data(fname) == False:
+            if not data.load_data(fname):
                 error = QErrorMessage()
                 error.showMessage("Problem while importing data.")
             else:
