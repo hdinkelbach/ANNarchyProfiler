@@ -454,18 +454,16 @@ class ProfilerWindow(QMainWindow):
                 factor = float(self.ui.txtFactor.text())
                 
                 obj = str(self.ui.ErrorbarChartTree.selectedItems()[0].text(0)).split(" - ")
-                mean_values = [self.current_data().recalc_mean_values(obj_type, obj[0], obj[1], factor)]
-                std_values = [self.current_data().values_each_test(obj_type, obj[0], obj[1], "std")]
-                
+                mean_values, std_values = self.current_data().recalc_mean_values(obj_type, obj[0], obj[1], factor)
+
                 if self.ui.chkStdValues.isChecked():
-                    self.ui.ErrorbarChart.draw(mean_values, std_values, yscale=str(self.ui.cmbScale.currentText()))
+                    self.ui.ErrorbarChart.draw([mean_values], [std_values], yscale=str(self.ui.cmbScale.currentText()))
                 else:
                     self.ui.ErrorbarChart.draw(mean_values, yscale=str(self.ui.cmbScale.currentText()))
-            
-    
-    #==============================================================================
+
+    # ==============================================================================
     # actions for the TreeWidget of PieChart
-    #==============================================================================
+    # ==============================================================================
     
     @pyqtSlot(QTreeWidgetItem,QTreeWidgetItem)
     def change_piechart_tree(self, current, previous):

@@ -22,6 +22,7 @@
 #
 # ==============================================================================
 from lxml import etree
+from numpy import zeros, mean, std
 import re
 
 
@@ -220,15 +221,25 @@ class DataContainer(object):
         mean_values = self.values_each_test(obj_type, name, func, "mean")
         std_values = self.values_each_test(obj_type, name, func, "std")
         raw_data = self.values_each_test(obj_type, name, func, "raw")
-        
+
+        # result container
+        new_mean = zeros(len(mean_values))
+        new_std = zeros(len(std_values))
+
+        # for each trial
         for i in xrange(len(mean_values)):
-            sum = 0
-            count = 0
+            without_outlier = []
+
+            # remove outlier iteratively
             for n in xrange(len(raw_data[i])):
                 if raw_data[i][n] <= (mean_values[i] + factor * std_values[i]) and raw_data[i][n] >= (mean_values[i] - factor * std_values[i]):
-                    count += 1
-                    sum += raw_data[i][n]
-            mean_values[i] = sum / count
-            
-        return mean_values
-        
+                    without_outlier.append(raw_data[i][n])
+
+            # store result
+            new_mean[i] = mean(without_outlier)
+            new_std[i] = std(without_outlier)
+
+            # debug
+            #print(mean(without_outlier), std(without_outlier), mean(raw_data[i]), std(raw_data[i]))
+
+        return new_mean, new_std
