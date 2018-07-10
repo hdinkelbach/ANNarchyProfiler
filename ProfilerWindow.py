@@ -21,6 +21,8 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==============================================================================
+import os
+
 from PyQt4.QtCore import pyqtSlot, Qt, SIGNAL
 from PyQt4.QtGui import QErrorMessage, QFileDialog, QMainWindow, QMessageBox, QTreeWidgetItem
 from PyQt4.uic import loadUi
@@ -97,9 +99,12 @@ class ProfilerWindow(QMainWindow):
         
     def current_data(self):
         """
-        Returns the data which is chosen over the combobox. If nothing chosen than it returns false.
+        Returns the data which is chosen over the combobox. If nothing chosen than it returns an empty DataContainer instance.
         """
-        if self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toString() == '': return False
+        if self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toString() == '': 
+            # This should not happen in practice ...
+            return DataContainer()
+        
         return self._data[str(self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toString())]
 
     # ==============================================================================
@@ -477,35 +482,39 @@ class ProfilerWindow(QMainWindow):
             topIdx = self.ui.PieChartTree.invisibleRootItem().indexOfChild(current)
             if topIdx != -1: # top element? (Network)
                 values = self.current_data().values_by_type(topIdx, "net")
+
+                # net-step = overhead + net-proj_step + net-psp + net-neur_step + rng + record
+                # whereas some parts are optional ...
+                overhead = values[values.keys()[0]]["step"]["mean"] - ( values[values.keys()[0]]["psp"]["mean"] + values[values.keys()[0]]["neur_step"]["mean"])
                 
+                # Add mandatory operations
+                data = [
+                    ["psp\n(" + "%.4f" % values[values.keys()[0]]["psp"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["psp"]["mean"]],
+                    ["neur_step\n(" + "%.4f" % values[values.keys()[0]]["neur_step"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["neur_step"]["mean"]],
+                    ["record\n(" + "%.4f" % values[values.keys()[0]]["record"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["record"]["mean"]]                    
+                ]
+
+                # TODO:
                 # Check if values for proj_step exists because its optional
-                # net-step = overhead + net-proj_step + net-psp + net-neur_step
-                if values[values.keys()[0]].has_key('proj_step'):
-                    overhead = values[values.keys()[0]]["step"]["mean"] - ( values[values.keys()[0]]["proj_step"]["mean"] + values[values.keys()[0]]["psp"]["mean"] + values[values.keys()[0]]["neur_step"]["mean"])
-                    
-                    data = [
-                        ["Overhead\n(" + "%.4f" % overhead + ")", "%.4f" % overhead],
-                        ["proj_step\n(" + "%.4f" % values[values.keys()[0]]["proj_step"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["proj_step"]["mean"]],
-                        ["psp\n(" + "%.4f" % values[values.keys()[0]]["psp"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["psp"]["mean"]],
-                        ["neur_step\n(" + "%.4f" % values[values.keys()[0]]["neur_step"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["neur_step"]["mean"]]
-                    ]   
-                else:
-                    overhead = values[values.keys()[0]]["step"]["mean"] - ( values[values.keys()[0]]["psp"]["mean"] + values[values.keys()[0]]["neur_step"]["mean"])
-                    
-                    data = [
-                        ["Overhead\n(" + "%.4f" % overhead + ")", "%.4f" % overhead],
-                        ["psp\n(" + "%.4f" % values[values.keys()[0]]["psp"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["psp"]["mean"]],
-                        ["neur_step\n(" + "%.4f" % values[values.keys()[0]]["neur_step"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["neur_step"]["mean"]]
-                    ] 
-                    
-               
+                overhead -= values[values.keys()[0]]["proj_step"]["mean"]
+                data.append(["proj_step\n(" + "%.4f" % values[values.keys()[0]]["proj_step"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["proj_step"]["mean"]])
+    
+                # TODO:
+                # Check if values for rng exists because its optional
+                overhead -= values[values.keys()[0]]["rng"]["mean"]
+                data.append(["Draw from RNG\n(" + "%.4f" % values[values.keys()[0]]["rng"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["rng"]["mean"]])
+
+                # Add overhead as last
+                data.append(["Overhead\n(" + "%.4f" % overhead + ")", "%.4f" % overhead])
                 self.ui.PieChart.draw(data, current.text(0) + " (in ms)", True)
             else:
                 childIdx = current.parent().indexOfChild(current)
+                print(childIdx)
                 topIdx = self.ui.PieChartTree.invisibleRootItem().indexOfChild(current.parent())
                 if topIdx != -1: # First child of Network?
                     try:
                         if childIdx == 0:
+                            # Overhead = net_neur_step - sum(all pop_step)
                             neur_step = self.current_data().values_by_function(topIdx, "net", "neur_step")
                             neur_step = neur_step[neur_step.keys()[0]]
                             func_data = self.current_data().values_by_function(topIdx, "pop", "step")
@@ -547,8 +556,22 @@ class ProfilerWindow(QMainWindow):
                             
                             values.append(["overhead", "%.4f" % overhead])
                         
+                        if childIdx == 3: # rng
+                            net_rng = self.current_data().values_by_function(topIdx, "net", "rng")
+                            net_rng = net_rng[net_rng.keys()[0]]
+                            func_data = self.current_data().values_by_function(topIdx, "pop", "rng")
+
+                            overhead = net_rng["mean"]
+                            values = []
+                            for key,value in func_data.items():
+        
+                                overhead -= value["mean"]
+                                values.append([str(key), "%.4f" % value["mean"]])
+                            
+                            values.append(["overhead", "%.4f" % overhead])
+
                         self.ui.PieChart.draw(values, current.text(0) + " (in ms)", False)
-                    
+
                     except IndexError:
                         self.ui.PieChart.clear()
             
@@ -563,6 +586,7 @@ class ProfilerWindow(QMainWindow):
             item.addChild(QTreeWidgetItem(["pop - step"]))
             item.addChild(QTreeWidgetItem(["proj - step"]))
             item.addChild(QTreeWidgetItem(["proj - psp"]))
+            item.addChild(QTreeWidgetItem(["rng"]))
             l.append(item)
         
         wdg.clear()
