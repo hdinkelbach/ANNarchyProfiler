@@ -213,6 +213,7 @@ class ProfilerWindow(QMainWindow):
         if self.current_data():
             self.update_piechart_tree()
             self.update_errorbarchart_tree()
+            self.update_barchart_tree()
     
     def update_cmb_thread(self):
         """
@@ -345,7 +346,26 @@ class ProfilerWindow(QMainWindow):
         
         self.ui.ThreadSelectTree.clear()
         self.ui.ThreadSelectTree.addTopLevelItems(l)
-         
+
+    #==============================================================================
+    # actions for the TreeWidget of BarChart
+    #==============================================================================
+    
+    @pyqtSlot(QTreeWidgetItem,QTreeWidgetItem)
+    def change_barchart_tree(self, current, previous=0):
+        """
+        If selection changed then filter data and draw chart.
+        
+        Signals:
+            * currentItemChanged(QTreeWidgetItem,QTreeWidgetItem) emitted from ErrorbarChartTree
+        """
+        pass
+
+    def update_barchart_tree(self):
+        """
+        Fill TreeWidget with data from container.
+        """
+        pass
     
     #==============================================================================
     # actions for the TreeWidget of ErrorbarChart
@@ -379,7 +399,7 @@ class ProfilerWindow(QMainWindow):
                     self.ui.ErrorbarChart.draw(mean_values, yscale=str(self.ui.cmbScale.currentText()))
             
                 self.ui.cmbRawData.clear()
-                for i in xrange(self.current_data().num_tests()):
+                for i in range(self.current_data().num_tests()):
                     self.ui.cmbRawData.addItem("Test " + str(i), i)
             
     def update_errorbarchart_tree(self):
@@ -481,35 +501,43 @@ class ProfilerWindow(QMainWindow):
         if current:
             topIdx = self.ui.PieChartTree.invisibleRootItem().indexOfChild(current)
             if topIdx != -1: # top element? (Network)
+                # TODO: what happens if multi-networks are measured ... ?
                 values = self.current_data().values_by_type(topIdx, "net")
+
+                #
+                # This assignment is for clarity of the following code ...
+                data_set = values[values.keys()[0]]
 
                 # net-step = overhead + net-proj_step + net-psp + net-neur_step + rng + record
                 # whereas some parts are optional ...
-                overhead = values[values.keys()[0]]["step"]["mean"] - ( values[values.keys()[0]]["psp"]["mean"] + values[values.keys()[0]]["neur_step"]["mean"])
-                
+                overhead = data_set["step"]["mean"] - ( data_set["psp"]["mean"] + data_set["neur_step"]["mean"])
+
+                #
                 # Add mandatory operations
                 data = [
-                    ["psp\n(" + "%.4f" % values[values.keys()[0]]["psp"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["psp"]["mean"]],
-                    ["neur_step\n(" + "%.4f" % values[values.keys()[0]]["neur_step"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["neur_step"]["mean"]],
-                    ["record\n(" + "%.4f" % values[values.keys()[0]]["record"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["record"]["mean"]]                    
+                    ["psp\n(" + "%.4f" % data_set["psp"]["mean"] + ")", "%.4f" % data_set["psp"]["mean"]],
+                    ["neur_step\n(" + "%.4f" % data_set["neur_step"]["mean"] + ")", "%.4f" % data_set["neur_step"]["mean"]],
                 ]
 
-                # TODO:
-                # Check if values for proj_step exists because its optional
-                overhead -= values[values.keys()[0]]["proj_step"]["mean"]
-                data.append(["proj_step\n(" + "%.4f" % values[values.keys()[0]]["proj_step"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["proj_step"]["mean"]])
-    
-                # TODO:
-                # Check if values for rng exists because its optional
-                overhead -= values[values.keys()[0]]["rng"]["mean"]
-                data.append(["Draw from RNG\n(" + "%.4f" % values[values.keys()[0]]["rng"]["mean"] + ")", "%.4f" % values[values.keys()[0]]["rng"]["mean"]])
+                #
+                # Check optional parts
+                if "record" in data_set.keys():
+                    overhead -= data_set["record"]["mean"]
+                    data.append(["record\n(" + "%.4f" % data_set["record"]["mean"] + ")", "%.4f" % data_set["record"]["mean"]])
 
-                # Add overhead as last
+                if "proj_step" in data_set.keys():
+                    overhead -= data_set["proj_step"]["mean"]
+                    data.append(["proj_step\n(" + "%.4f" % data_set["proj_step"]["mean"] + ")", "%.4f" % data_set["proj_step"]["mean"]])
+                
+                if "rng" in data_set.keys():
+                    overhead -= data_set["rng"]["mean"]
+                    data.append(["Draw from RNG\n(" + "%.4f" % data_set["rng"]["mean"] + ")", "%.4f" % data_set["rng"]["mean"]])
+
+                # Add overhead as last, its the time span which is obviously not measured ...
                 data.append(["Overhead\n(" + "%.4f" % overhead + ")", "%.4f" % overhead])
                 self.ui.PieChart.draw(data, current.text(0) + " (in ms)", True)
             else:
                 childIdx = current.parent().indexOfChild(current)
-                print(childIdx)
                 topIdx = self.ui.PieChartTree.invisibleRootItem().indexOfChild(current.parent())
                 if topIdx != -1: # First child of Network?
                     try:
@@ -579,14 +607,22 @@ class ProfilerWindow(QMainWindow):
         """
         Fill TreeWidget with data from container.
         """
+        top_lvl_obj = self.current_data().unique_function_names("net")
+
         wdg = self.ui.PieChartTree
         l = []
-        for i in xrange(self.current_data().num_tests()):
+        for i in range(self.current_data().num_tests()):
             item = QTreeWidgetItem(["Measurement " + str(i)])
             item.addChild(QTreeWidgetItem(["pop - step"]))
             item.addChild(QTreeWidgetItem(["proj - step"]))
             item.addChild(QTreeWidgetItem(["proj - psp"]))
-            item.addChild(QTreeWidgetItem(["rng"]))
+            if "network - rng" in top_lvl_obj:
+                item.addChild(QTreeWidgetItem(["rng"]))
+            if "network - record" in top_lvl_obj:
+                #TODO: 
+                # item.addChild(QTreeWidgetItem(["record"]))
+                pass
+                
             l.append(item)
         
         wdg.clear()

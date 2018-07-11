@@ -99,8 +99,8 @@ class PieChartWidget(MatplotlibWidget):
         if percentage:
             form = '%1.1f%%'
         else:
-            form = lambda(p): '{:.4f}'.format(p * total / 100)
-
+            form = lambda p: "{:.4f}".format(p * total / 100)
+            
         # create an axis
         ax = self._figure.gca()
         ax.clear()
@@ -184,3 +184,36 @@ class ErrorbarChartWidget(MatplotlibWidget):
         # show graph
         self._canvas.draw()
         
+class BarChartWidget(MatplotlibWidget):
+    """
+     Draws a errorbar chart as Qt-Widget from data
+    """
+    def __init__(self, parent=None):
+        """
+        Init function.
+
+        Arguments:
+            * parent -- parent element of this widget -- default = None
+        """
+        super(BarChartWidget, self).__init__(parent)
+
+    def draw(self, data, title, percentage):
+        """
+        Draw pie chart from given data.
+
+        Arguments:
+            * data (array) -- values to draw
+            * title (str) -- text shown over the chart
+            * percentage (boolean) -- data shown as percentages?
+
+        Signals:
+            * drawPieChart(PyQt_PyObject) emited from PieChartTree.current_item_changed()
+        """
+        # create an axis
+        ax = self._figure.gca()
+        ax.clear()
+
+        print("x")
+
+        # show graph
+        self._canvas.draw()

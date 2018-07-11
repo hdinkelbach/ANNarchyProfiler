@@ -53,7 +53,7 @@ class DataContainer(object):
         Arguments:
             * strng -- string to be converted to an array
         """
-        values = re.split('[\s]+', strng)
+        values = re.split(r'[\s]+', strng)
         ret = []
         for val in values:
             try:
@@ -179,7 +179,9 @@ class DataContainer(object):
         Return the names of all defined functions for a object type
         """
         names = []
-        
+        if self._data.keys() == []:
+            return names
+
         for name, name_val in self._data[0][obj_type].items():
             for func_name in name_val:
                 names.append(name + " - " + func_name)
@@ -227,11 +229,11 @@ class DataContainer(object):
         new_std = zeros(len(std_values))
 
         # for each trial
-        for i in xrange(len(mean_values)):
+        for i in range(len(mean_values)):
             without_outlier = []
 
             # remove outlier iteratively
-            for n in xrange(len(raw_data[i])):
+            for n in range(len(raw_data[i])):
                 if raw_data[i][n] <= (mean_values[i] + factor * std_values[i]) and raw_data[i][n] >= (mean_values[i] - factor * std_values[i]):
                     without_outlier.append(raw_data[i][n])
 
