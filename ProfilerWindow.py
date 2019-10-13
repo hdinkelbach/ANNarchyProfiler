@@ -101,11 +101,13 @@ class ProfilerWindow(QMainWindow):
         """
         Returns the data which is chosen over the combobox. If nothing chosen than it returns an empty DataContainer instance.
         """
-        if self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()) == '': 
-            # This should not happen in practice ...
-            return DataContainer()
+        sel_idx = self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex())
         
-        return self._data[str(self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()))]
+        # Sanity check, if something is selected
+        if sel_idx == None or sel_idx == '':
+            return DataContainer()
+
+        return self._data[sel_idx]
 
     # ==============================================================================
     # actions for the buttons in the menu bar

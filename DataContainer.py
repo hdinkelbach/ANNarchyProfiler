@@ -122,7 +122,7 @@ class DataContainer(object):
             self._data[num_tests][obj_type][name][func] = {"mean" : mean, "std" : std, "raw" :  raw}
                 
         self._num_tests = num_tests + 1
-        
+
         return True
     
     def num_threads(self):
@@ -179,7 +179,10 @@ class DataContainer(object):
         Return the names of all defined functions for a object type
         """
         names = []
-        if self._data.keys() == []:
+        if len(self._data.keys()) == 0:
+            # HD: 13th Oct 2019:
+            #   An unitialized DataContainer was called, this could be a
+            #   result of: ProfilerWindow.current_data()
             return names
 
         for name, name_val in self._data[0][obj_type].items():
