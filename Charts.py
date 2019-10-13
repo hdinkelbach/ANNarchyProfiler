@@ -21,7 +21,8 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==============================================================================
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtWidgets import QWidget, QVBoxLayout
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
@@ -29,7 +30,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-class MatplotlibWidget(QtGui.QWidget):
+class MatplotlibWidget(QWidget):
     """
     A Widget to include matplotlib figures in Qt-Applications.
     """
@@ -45,7 +46,7 @@ class MatplotlibWidget(QtGui.QWidget):
         self._figure = plt.figure(facecolor='white')
         self._canvas = FigureCanvas(self._figure)
 
-        self._layoutVertical = QtGui.QVBoxLayout(self)
+        self._layoutVertical = QVBoxLayout(self)
         self._layoutVertical.addWidget(self._canvas)
 
     def figure(self):

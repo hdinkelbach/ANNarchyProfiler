@@ -23,9 +23,9 @@
 # ==============================================================================
 import os
 
-from PyQt4.QtCore import pyqtSlot, Qt, SIGNAL
-from PyQt4.QtGui import QErrorMessage, QFileDialog, QMainWindow, QMessageBox, QTreeWidgetItem
-from PyQt4.uic import loadUi
+from PyQt5.QtCore import pyqtSlot, Qt
+from PyQt5.QtWidgets import QErrorMessage, QFileDialog, QMainWindow, QMessageBox, QTreeWidgetItem
+from PyQt5.uic import loadUi
 
 from DataContainer import DataContainer
 from RunDialog import RunDialog
@@ -44,9 +44,9 @@ class ProfilerWindow(QMainWindow):
         self.ui = loadUi("ProfilerWindow.ui")
         
         # actions menubar
-        self.ui.btnLoadData.activated.connect(self.load_data_dialog)
-        self.ui.btnRunMeasurement.activated.connect(self.load_run_dialog)
-        self.ui.btnSave.activated.connect(self.save_chart)
+        self.ui.btnLoadData.triggered.connect(self.load_data_dialog)
+        self.ui.btnRunMeasurement.triggered.connect(self.load_run_dialog)
+        self.ui.btnSave.triggered.connect(self.save_chart)
         
         # action combobox
         self.ui.cmbThread.currentIndexChanged.connect(self.change_cmb_thread)

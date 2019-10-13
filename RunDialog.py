@@ -21,9 +21,8 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #==============================================================================
-from PyQt4.QtCore import SIGNAL
-from PyQt4.QtGui import QDialog, QFileDialog
-from PyQt4.uic import loadUi
+from PyQt5.QtWidgets import QDialog, QFileDialog
+from PyQt5.uic import loadUi
 
 class RunDialog(QDialog):
     """
