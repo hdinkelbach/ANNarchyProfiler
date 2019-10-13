@@ -83,7 +83,7 @@ class ProfilerWindow(QMainWindow):
             * data (DataContainer) -- new data to hold in app
         """
         # Show warning if data for paradigm with same number of threads exists
-        if self._data.has_key(data.key()):
+        if data.key() in self._data:
             msg = QMessageBox()
             msg.setText(data.paradigm() + " with " + str(data.num_threads()) + " threads already exists. Want to overwrite?")
             msg.setIcon(QMessageBox.Warning)
@@ -101,11 +101,11 @@ class ProfilerWindow(QMainWindow):
         """
         Returns the data which is chosen over the combobox. If nothing chosen than it returns an empty DataContainer instance.
         """
-        if self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toString() == '': 
+        if self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()) == '': 
             # This should not happen in practice ...
             return DataContainer()
         
-        return self._data[str(self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()).toString())]
+        return self._data[str(self.ui.cmbThread.itemData(self.ui.cmbThread.currentIndex()))]
 
     # ==============================================================================
     # actions for the buttons in the menu bar
@@ -119,9 +119,10 @@ class ProfilerWindow(QMainWindow):
         Signals:
             * activated() emitted from btnLoadData in menubar
         """
-        fnames = QFileDialog.getOpenFileNames(self, 'Open data file', '.', '*.xml')
+        fnames, _ = QFileDialog.getOpenFileNames(self, 'Open data file', '.', '*.xml')
 
         for fname in fnames:
+            # Process the file and store the date in a container
             data = DataContainer()
             if not data.load_data(fname):
                 error = QErrorMessage()
@@ -260,7 +261,7 @@ class ProfilerWindow(QMainWindow):
             idx = []
             for i in range(root.childCount()):
                 if root.child(i).checkState(0) == Qt.Checked:
-                    idx.append(str(self.ui.cmbThread.itemData(i).toString()))
+                    idx.append(str(self.ui.cmbThread.itemData(i)))
             
             if len(idx) == 0:
                 return
@@ -287,10 +288,11 @@ class ProfilerWindow(QMainWindow):
             labels = []
             
             for i in idx:
-                paradigm,thread_count = i.split('-')
+                paradigm, thread_count = i.split('-')
+                paradigm_key = paradigm + '-1'
     
-                if thread_count != '1' and self._data.has_key(paradigm + '-1'):
-                    mean_one_thread = self._data[paradigm + '-1'].values_each_test(obj_type, obj[0], obj[1], "mean")
+                if thread_count != '1' and paradigm_key in self._data:
+                    mean_one_thread = self._data[paradigm_key].values_each_test(obj_type, obj[0], obj[1], "mean")
                     mean_value = self._data[i].values_each_test(obj_type, obj[0], obj[1], "mean")
                     for n in range(len(mean_value)):
                         mean_value[n] = mean_one_thread[n] / mean_value[n]
@@ -506,7 +508,7 @@ class ProfilerWindow(QMainWindow):
 
                 #
                 # This assignment is for clarity of the following code ...
-                data_set = values[values.keys()[0]]
+                data_set = values[list(values.keys())[0]]
 
                 # net-step = overhead + net-proj_step + net-psp + net-neur_step + rng + record
                 # whereas some parts are optional ...
@@ -544,7 +546,7 @@ class ProfilerWindow(QMainWindow):
                         if childIdx == 0:
                             # Overhead = net_neur_step - sum(all pop_step)
                             neur_step = self.current_data().values_by_function(topIdx, "net", "neur_step")
-                            neur_step = neur_step[neur_step.keys()[0]]
+                            neur_step = neur_step[list(neur_step.keys())[0]]
                             func_data = self.current_data().values_by_function(topIdx, "pop", "step")
         
                             overhead = neur_step["mean"]
@@ -558,7 +560,7 @@ class ProfilerWindow(QMainWindow):
                             
                         if childIdx == 1:
                             proj_step = self.current_data().values_by_function(topIdx, "net", "proj_step")
-                            proj_step = proj_step[proj_step.keys()[0]]
+                            proj_step = proj_step[list(proj_step.keys())[0]]
                             func_data = self.current_data().values_by_function(topIdx, "proj", "step")
         
                             overhead = proj_step["mean"]
@@ -572,7 +574,7 @@ class ProfilerWindow(QMainWindow):
                             
                         if childIdx == 2:
                             net_psp = self.current_data().values_by_function(topIdx, "net", "psp")
-                            net_psp = net_psp[net_psp.keys()[0]]
+                            net_psp = net_psp[list(net_psp.keys())[0]]
                             func_data = self.current_data().values_by_function(topIdx, "proj", "psp")
         
                             overhead = net_psp["mean"]
@@ -586,7 +588,7 @@ class ProfilerWindow(QMainWindow):
                         
                         if childIdx == 3: # rng
                             net_rng = self.current_data().values_by_function(topIdx, "net", "rng")
-                            net_rng = net_rng[net_rng.keys()[0]]
+                            net_rng = net_rng[list(net_rng.keys())[0]]
                             func_data = self.current_data().values_by_function(topIdx, "pop", "rng")
 
                             overhead = net_rng["mean"]
