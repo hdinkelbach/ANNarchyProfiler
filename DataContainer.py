@@ -113,7 +113,7 @@ class DataContainer(object):
             std = float(dataset.find("std").text)
             raw = self._convert_string_to_array(dataset.find("raw_data").text)
             
-            if obj_type == "net" and func == "neur_step": # Check for first element of network
+            if obj_type == "net" and func == "global_op": # Check for first element of network
                 num_tests += 1
                 self._data[num_tests] = {"net" : {}, "pop" : {}, "proj" : {}}
             
