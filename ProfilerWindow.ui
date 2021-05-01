@@ -1,455 +1,463 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ProfilerWindow</class>
- <widget class="QMainWindow" name="ProfilerWindow">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>787</width>
-    <height>600</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>ANNarchy Profiler</string>
-  </property>
-  <widget class="QWidget" name="CentralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <property name="spacing">
-       <number>20</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QComboBox" name="cmbThread">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+    <class>ProfilerWindow</class>
+    <widget class="QMainWindow" name="ProfilerWindow">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>787</width>
+                <height>600</height>
+            </rect>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>250</width>
-          <height>16777215</height>
-         </size>
+        <property name="windowTitle">
+            <string>ANNarchy Profiler</string>
         </property>
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="cmbScale">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>200</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="sizeIncrement">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <item>
-         <property name="text">
-          <string>linear</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>log</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="chkStdValues">
-        <property name="text">
-         <string>Show std values</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <widget class="QTabWidget" name="AnalyzerWidget">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="tabPosition">
-       <enum>QTabWidget::North</enum>
-      </property>
-      <property name="currentIndex">
-       <number>2</number>
-      </property>
-      <widget class="QWidget" name="deviation_chart">
-       <attribute name="title">
-        <string>Standard deviation</string>
-       </attribute>
-       <layout class="QHBoxLayout" name="errorbar_chart_layout">
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QTreeWidget" name="ErrorbarChartTree">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-              <horstretch>100</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+        <widget class="QWidget" name="CentralWidget">
+            <layout class="QVBoxLayout" name="verticalLayout">
+                <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_3">
+                        <property name="spacing">
+                            <number>20</number>
+                        </property>
+                        <property name="topMargin">
+                            <number>0</number>
+                        </property>
+                        <item>
+                            <widget class="QComboBox" name="cmbThread">
+                                <property name="sizePolicy">
+                                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="maximumSize">
+                                    <size>
+                                        <width>250</width>
+                                        <height>16777215</height>
+                                    </size>
+                                </property>
+                                <property name="layoutDirection">
+                                    <enum>Qt::LeftToRight</enum>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <widget class="QComboBox" name="cmbScale">
+                                <property name="sizePolicy">
+                                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="maximumSize">
+                                    <size>
+                                        <width>200</width>
+                                        <height>16777215</height>
+                                    </size>
+                                </property>
+                                <property name="sizeIncrement">
+                                    <size>
+                                        <width>0</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                                <item>
+                                    <property name="text">
+                                        <string>linear</string>
+                                    </property>
+                                </item>
+                                <item>
+                                    <property name="text">
+                                        <string>log</string>
+                                    </property>
+                                </item>
+                            </widget>
+                        </item>
+                        <item>
+                            <widget class="QCheckBox" name="chkStdValues">
+                                <property name="text">
+                                    <string>Show std values</string>
+                                </property>
+                                <property name="checked">
+                                    <bool>true</bool>
+                                </property>
+                            </widget>
+                        </item>
+                    </layout>
+                </item>
+                <item>
+                    <widget class="QTabWidget" name="AnalyzerWidget">
+                        <property name="sizePolicy">
+                            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
+                        <property name="tabPosition">
+                            <enum>QTabWidget::North</enum>
+                        </property>
+                        <property name="currentIndex">
+                            <number>2</number>
+                        </property>
+                        <widget class="QWidget" name="deviation_chart">
+                            <attribute name="title">
+                                <string>Standard deviation</string>
+                            </attribute>
+                            <layout class="QHBoxLayout" name="errorbar_chart_layout">
+                                <item>
+                                    <layout class="QVBoxLayout" name="verticalLayout_4">
+                                        <property name="rightMargin">
+                                            <number>0</number>
+                                        </property>
+                                        <item>
+                                            <widget class="QTreeWidget" name="ErrorbarChartTree">
+                                                <property name="sizePolicy">
+                                                    <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                                                        <horstretch>100</horstretch>
+                                                        <verstretch>0</verstretch>
+                                                    </sizepolicy>
+                                                </property>
+                                                <attribute name="headerVisible">
+                                                    <bool>false</bool>
+                                                </attribute>
+                                                <column>
+                                                    <property name="text">
+                                                        <string notr="true">1</string>
+                                                    </property>
+                                                </column>
+                                            </widget>
+                                        </item>
+                                        <item>
+                                            <layout class="QGridLayout" name="gridLayout">
+                                                <property name="topMargin">
+                                                    <number>0</number>
+                                                </property>
+                                                <item row="1" column="0">
+                                                    <widget class="QComboBox" name="cmbRawData" />
+                                                </item>
+                                                <item row="0" column="0">
+                                                    <widget class="QLabel" name="lblRawData">
+                                                        <property name="text">
+                                                            <string>Raw data</string>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item row="1" column="1">
+                                                    <widget class="QPushButton" name="btnRawData">
+                                                        <property name="sizePolicy">
+                                                            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                                                                <horstretch>0</horstretch>
+                                                                <verstretch>0</verstretch>
+                                                            </sizepolicy>
+                                                        </property>
+                                                        <property name="maximumSize">
+                                                            <size>
+                                                                <width>70</width>
+                                                                <height>16777215</height>
+                                                            </size>
+                                                        </property>
+                                                        <property name="text">
+                                                            <string>Show</string>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item row="2" column="0">
+                                                    <widget class="QLabel" name="lblRecalc">
+                                                        <property name="text">
+                                                            <string>Recalc mean values</string>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item row="3" column="0">
+                                                    <widget class="QLineEdit" name="txtFactor">
+                                                        <property name="sizePolicy">
+                                                            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                                                <horstretch>0</horstretch>
+                                                                <verstretch>0</verstretch>
+                                                            </sizepolicy>
+                                                        </property>
+                                                        <property name="maximumSize">
+                                                            <size>
+                                                                <width>16777215</width>
+                                                                <height>16777215</height>
+                                                            </size>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item row="3" column="1">
+                                                    <widget class="QPushButton" name="btnRecalc">
+                                                        <property name="sizePolicy">
+                                                            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                                                                <horstretch>0</horstretch>
+                                                                <verstretch>0</verstretch>
+                                                            </sizepolicy>
+                                                        </property>
+                                                        <property name="maximumSize">
+                                                            <size>
+                                                                <width>70</width>
+                                                                <height>16777215</height>
+                                                            </size>
+                                                        </property>
+                                                        <property name="text">
+                                                            <string>Show</string>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                            </layout>
+                                        </item>
+                                    </layout>
+                                </item>
+                                <item>
+                                    <layout class="QVBoxLayout" name="verticalLayout_3">
+                                        <property name="spacing">
+                                            <number>6</number>
+                                        </property>
+                                        <property name="rightMargin">
+                                            <number>0</number>
+                                        </property>
+                                    </layout>
+                                </item>
+                                <item>
+                                    <widget class="ErrorbarChartWidget" name="ErrorbarChart" native="true">
+                                        <property name="sizePolicy">
+                                            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                                <horstretch>0</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                    </widget>
+                                </item>
+                            </layout>
+                        </widget>
+                        <widget class="QWidget" name="PieChartTab">
+                            <attribute name="title">
+                                <string>Pie chart</string>
+                            </attribute>
+                            <layout class="QHBoxLayout" name="pie_chart_layout">
+                                <item>
+                                    <widget class="QTreeWidget" name="PieChartTree">
+                                        <property name="sizePolicy">
+                                            <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                                                <horstretch>100</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <attribute name="headerVisible">
+                                            <bool>false</bool>
+                                        </attribute>
+                                        <attribute name="headerStretchLastSection">
+                                            <bool>true</bool>
+                                        </attribute>
+                                        <column>
+                                            <property name="text">
+                                                <string notr="true">1</string>
+                                            </property>
+                                        </column>
+                                    </widget>
+                                </item>
+                                <item alignment="Qt::AlignHCenter">
+                                    <widget class="PieChartWidget" name="PieChart" native="true" />
+                                </item>
+                            </layout>
+                        </widget>
+                        <widget class="QWidget" name="MultiThreadTab">
+                            <attribute name="title">
+                                <string>Multi-Thread</string>
+                            </attribute>
+                            <layout class="QHBoxLayout" name="horizontalLayout">
+                                <item>
+                                    <layout class="QVBoxLayout" name="verticalLayout_2">
+                                        <item>
+                                            <widget class="QTreeWidget" name="ThreadSelectTree">
+                                                <property name="sizePolicy">
+                                                    <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                                                        <horstretch>0</horstretch>
+                                                        <verstretch>0</verstretch>
+                                                    </sizepolicy>
+                                                </property>
+                                                <attribute name="headerVisible">
+                                                    <bool>false</bool>
+                                                </attribute>
+                                                <column>
+                                                    <property name="text">
+                                                        <string notr="true">1</string>
+                                                    </property>
+                                                </column>
+                                            </widget>
+                                        </item>
+                                        <item>
+                                            <widget class="QTreeWidget" name="FunctionSelectTree">
+                                                <property name="sizePolicy">
+                                                    <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                                                        <horstretch>0</horstretch>
+                                                        <verstretch>0</verstretch>
+                                                    </sizepolicy>
+                                                </property>
+                                                <attribute name="headerVisible">
+                                                    <bool>false</bool>
+                                                </attribute>
+                                                <column>
+                                                    <property name="text">
+                                                        <string notr="true">1</string>
+                                                    </property>
+                                                </column>
+                                            </widget>
+                                        </item>
+                                    </layout>
+                                </item>
+                                <item>
+                                    <widget class="QTabWidget" name="tabWidget">
+                                        <property name="tabPosition">
+                                            <enum>QTabWidget::South</enum>
+                                        </property>
+                                        <property name="currentIndex">
+                                            <number>1</number>
+                                        </property>
+                                        <widget class="QWidget" name="MutiThreadComparisionTab">
+                                            <attribute name="title">
+                                                <string>Multi-Thread Comparision</string>
+                                            </attribute>
+                                            <layout class="QHBoxLayout" name="horizontalLayout_5">
+                                                <property name="leftMargin">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="topMargin">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="rightMargin">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="bottomMargin">
+                                                    <number>0</number>
+                                                </property>
+                                                <item>
+                                                    <widget class="ErrorbarChartWidget" name="MultiThreadChart" native="true" />
+                                                </item>
+                                            </layout>
+                                        </widget>
+                                        <widget class="QWidget" name="SpeedupTab">
+                                            <attribute name="title">
+                                                <string>Speedup</string>
+                                            </attribute>
+                                            <layout class="QHBoxLayout" name="horizontalLayout_4">
+                                                <property name="spacing">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="leftMargin">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="topMargin">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="rightMargin">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="bottomMargin">
+                                                    <number>0</number>
+                                                </property>
+                                                <item>
+                                                    <widget class="ErrorbarChartWidget" name="SpeedupChart" native="true" />
+                                                </item>
+                                            </layout>
+                                        </widget>
+                                        <widget class="QWidget" name="ProportionTab">
+                                            <attribute name="title">
+                                                <string>Proportion</string>
+                                            </attribute>
+                                            <layout class="QHBoxLayout" name="horizontalLayout_6">
+                                                <property name="spacing">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="leftMargin">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="topMargin">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="rightMargin">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="bottomMargin">
+                                                    <number>0</number>
+                                                </property>
+                                                <item>
+                                                    <widget class="BarChartWidget" name="ProportionChart" native="true" />
+                                                </item>
+                                            </layout>
+                                        </widget>
+                                    </widget>
+                                </item>
+                            </layout>
+                        </widget>
+                    </widget>
+                </item>
+            </layout>
+        </widget>
+        <widget class="QMenuBar" name="menubar">
+            <property name="geometry">
+                <rect>
+                    <x>0</x>
+                    <y>0</y>
+                    <width>787</width>
+                    <height>22</height>
+                </rect>
             </property>
-            <attribute name="headerVisible">
-             <bool>false</bool>
-            </attribute>
-            <column>
-             <property name="text">
-              <string notr="true">1</string>
-             </property>
-            </column>
-           </widget>
-          </item>
-          <item>
-           <layout class="QGridLayout" name="gridLayout">
-            <property name="topMargin">
-             <number>0</number>
+            <widget class="QMenu" name="menuStart">
+                <property name="title">
+                    <string>Start</string>
+                </property>
+                <addaction name="btnLoadData" />
+                <addaction name="btnRunMeasurement" />
+                <addaction name="btnSave" />
+            </widget>
+            <addaction name="menuStart" />
+        </widget>
+        <action name="btnLoadData">
+            <property name="text">
+                <string>Load data</string>
             </property>
-            <item row="1" column="0">
-             <widget class="QComboBox" name="cmbRawData"/>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="lblRawData">
-              <property name="text">
-               <string>Raw data</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QPushButton" name="btnRawData">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>70</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Show</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="lblRecalc">
-              <property name="text">
-               <string>Recalc mean values</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLineEdit" name="txtFactor">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QPushButton" name="btnRecalc">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>70</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Show</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <property name="spacing">
-           <number>6</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-         </layout>
-        </item>
-        <item>
-         <widget class="ErrorbarChartWidget" name="ErrorbarChart" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="PieChartTab">
-       <attribute name="title">
-        <string>Pie chart</string>
-       </attribute>
-       <layout class="QHBoxLayout" name="pie_chart_layout">
-        <item>
-         <widget class="QTreeWidget" name="PieChartTree">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-            <horstretch>100</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <attribute name="headerVisible">
-           <bool>false</bool>
-          </attribute>
-          <attribute name="headerStretchLastSection">
-           <bool>true</bool>
-          </attribute>
-          <column>
-           <property name="text">
-            <string notr="true">1</string>
-           </property>
-          </column>
-         </widget>
-        </item>
-        <item alignment="Qt::AlignHCenter">
-         <widget class="PieChartWidget" name="PieChart" native="true"/>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="MultiThreadTab">
-       <attribute name="title">
-        <string>Multi-Thread</string>
-       </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QTreeWidget" name="ThreadSelectTree">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+            <property name="shortcut">
+                <string>Ctrl+O</string>
             </property>
-            <attribute name="headerVisible">
-             <bool>false</bool>
-            </attribute>
-            <column>
-             <property name="text">
-              <string notr="true">1</string>
-             </property>
-            </column>
-           </widget>
-          </item>
-          <item>
-           <widget class="QTreeWidget" name="FunctionSelectTree">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+        </action>
+        <action name="btnRunMeasurement">
+            <property name="text">
+                <string>Run measurement</string>
             </property>
-            <attribute name="headerVisible">
-             <bool>false</bool>
-            </attribute>
-            <column>
-             <property name="text">
-              <string notr="true">1</string>
-             </property>
-            </column>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QTabWidget" name="tabWidget">
-          <property name="tabPosition">
-           <enum>QTabWidget::South</enum>
-          </property>
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <widget class="QWidget" name="MutiThreadComparisionTab">
-           <attribute name="title">
-            <string>Multi-Thread Comparision</string>
-           </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <property name="leftMargin">
-             <number>0</number>
+            <property name="shortcut">
+                <string>Ctrl+R</string>
             </property>
-            <property name="topMargin">
-             <number>0</number>
+        </action>
+        <action name="btnSave">
+            <property name="text">
+                <string>Save</string>
             </property>
-            <property name="rightMargin">
-             <number>0</number>
+            <property name="shortcut">
+                <string>Ctrl+S</string>
             </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="ErrorbarChartWidget" name="MultiThreadChart" native="true"/>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="SpeedupTab">
-           <attribute name="title">
-            <string>Speedup</string>
-           </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <property name="spacing">
-             <number>0</number>
-            </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="ErrorbarChartWidget" name="SpeedupChart" native="true"/>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab">
-           <attribute name="title">
-            <string>Proportion</string>
-           </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <widget class="BarChartWidget" name="widget" native="true">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>787</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuStart">
-    <property name="title">
-     <string>Start</string>
-    </property>
-    <addaction name="btnLoadData"/>
-    <addaction name="btnRunMeasurement"/>
-    <addaction name="btnSave"/>
-   </widget>
-   <addaction name="menuStart"/>
-  </widget>
-  <action name="btnLoadData">
-   <property name="text">
-    <string>Load data</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+O</string>
-   </property>
-  </action>
-  <action name="btnRunMeasurement">
-   <property name="text">
-    <string>Run measurement</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+R</string>
-   </property>
-  </action>
-  <action name="btnSave">
-   <property name="text">
-    <string>Save</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+S</string>
-   </property>
-  </action>
- </widget>
- <customwidgets>
-  <customwidget>
-   <class>PieChartWidget</class>
-   <extends>QWidget</extends>
-   <header>Charts</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ErrorbarChartWidget</class>
-   <extends>QWidget</extends>
-   <header>Charts</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>BarChartWidget</class>
-   <extends>QWidget</extends>
-   <header>Charts</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
- <resources/>
- <connections/>
+        </action>
+    </widget>
+    <customwidgets>
+        <customwidget>
+            <class>PieChartWidget</class>
+            <extends>QWidget</extends>
+            <header>Charts</header>
+            <container>1</container>
+        </customwidget>
+        <customwidget>
+            <class>ErrorbarChartWidget</class>
+            <extends>QWidget</extends>
+            <header>Charts</header>
+            <container>1</container>
+        </customwidget>
+        <customwidget>
+            <class>BarChartWidget</class>
+            <extends>QWidget</extends>
+            <header>Charts</header>
+            <container>1</container>
+        </customwidget>
+    </customwidgets>
+    <resources />
+    <connections />
 </ui>

@@ -21,19 +21,18 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ==============================================================================
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtWidgets import QWidget, QVBoxLayout
-
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
-
 import numpy as np
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtWidgets import QVBoxLayout, QWidget
 
 
 class MatplotlibWidget(QWidget):
     """
     A Widget to include matplotlib figures in Qt-Applications.
     """
+
     def __init__(self, parent=None):
         """
         Set layout of widget.
@@ -43,7 +42,7 @@ class MatplotlibWidget(QWidget):
         """
         super(MatplotlibWidget, self).__init__(parent)
 
-        self._figure = plt.figure(facecolor='white')
+        self._figure = plt.figure(facecolor="white")
         self._canvas = FigureCanvas(self._figure)
 
         self._layoutVertical = QVBoxLayout(self)
@@ -54,7 +53,7 @@ class MatplotlibWidget(QWidget):
         Return matplotlib-figure of the widget.
         """
         return self._figure
-    
+
     def clear(self):
         """
         Clear the chart.
@@ -63,10 +62,12 @@ class MatplotlibWidget(QWidget):
         self._figure.clf()
         self._canvas.draw()
 
+
 class PieChartWidget(MatplotlibWidget):
     """
     A widget to draw a pie chart from given data.
     """
+
     def __init__(self, parent=None):
         """
         Init function.
@@ -98,18 +99,24 @@ class PieChartWidget(MatplotlibWidget):
 
         # set format of output values
         if percentage:
-            form = '%1.1f%%'
+            form = "%1.1f%%"
         else:
             form = lambda p: "{:.4f}".format(p * total / 100)
-            
+
         # create an axis
         ax = self._figure.gca()
         ax.clear()
 
         # draw chart
-        ax.pie(values, labels=labels,
-               autopct=form, startangle=90,
-               radius=0.25, center=(0, 0), frame=True)
+        ax.pie(
+            values,
+            labels=labels,
+            autopct=form,
+            startangle=90,
+            radius=0.25,
+            center=(0, 0),
+            frame=True,
+        )
 
         # set axis limit
         ax.set_axis_off()
@@ -118,15 +125,17 @@ class PieChartWidget(MatplotlibWidget):
         ax.set_title(title)
 
         # Set aspect ratio to be equal so that pie is drawn as a circle.
-        ax.set_aspect('equal')
+        ax.set_aspect("equal")
 
         # refresh canvas
         self._canvas.draw()
 
+
 class ErrorbarChartWidget(MatplotlibWidget):
     """
-     Draws a errorbar chart as Qt-Widget from data
+    Draws a errorbar chart as Qt-Widget from data
     """
+
     def __init__(self, parent=None):
         """
         Init function.
@@ -136,8 +145,15 @@ class ErrorbarChartWidget(MatplotlibWidget):
         """
         super(ErrorbarChartWidget, self).__init__(parent)
 
-    def draw(self, values, std_values=0, labels=[], xlabel="test nr.", ylabel="mean_value (in ms)",
-             yscale="linear"):
+    def draw(
+        self,
+        values,
+        std_values=0,
+        labels=[],
+        xlabel="test nr.",
+        ylabel="mean_value (in ms)",
+        yscale="linear",
+    ):
         """
         Draw errorbar chart from given data.
 
@@ -160,7 +176,7 @@ class ErrorbarChartWidget(MatplotlibWidget):
 
         # draw errorbar chart
         for i in range(len(values)):
-            lbl = ''
+            lbl = ""
             if len(labels) != 0:
                 lbl = labels[i]
 
@@ -168,9 +184,9 @@ class ErrorbarChartWidget(MatplotlibWidget):
             y = values[i]
 
             if std_values == 0:
-                ax.errorbar(x, y, fmt='-o', label=lbl)
+                ax.errorbar(x, y, fmt="-o", label=lbl)
             else:
-                ax.errorbar(x, y, yerr=std_values[i], fmt='-o', label=lbl)
+                ax.errorbar(x, y, yerr=std_values[i], fmt="-o", label=lbl)
 
         # add options to the chart
         # ax.set_title('variable, symmetric error')
@@ -183,12 +199,15 @@ class ErrorbarChartWidget(MatplotlibWidget):
             ax.legend()
 
         # show graph
+        print("Drawing an ErrorbarCharWidget")
         self._canvas.draw()
-        
+
+
 class BarChartWidget(MatplotlibWidget):
     """
-     Draws a errorbar chart as Qt-Widget from data
+    Draws a errorbar chart as Qt-Widget from data
     """
+
     def __init__(self, parent=None):
         """
         Init function.
@@ -214,7 +233,6 @@ class BarChartWidget(MatplotlibWidget):
         ax = self._figure.gca()
         ax.clear()
 
-        print("x")
-
         # show graph
+        print("Drawing a BarChartWidget")
         self._canvas.draw()
