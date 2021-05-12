@@ -230,36 +230,39 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
                     objectName = c.text(0)
         print(fileNames)
         print(objectName)
-        self.plot.axes.clear()
-        selection = self.dbCursor.execute("SELECT DISTINCT func FROM datasets")
-        funcNames = [v[0] for v in list(selection)]
-        for funcName in funcNames:
-            funcValues = list()
-            for fileName in fileNames:
-                selection = self.dbCursor.execute(
-                    "SELECT mean FROM datasets WHERE file=:fileName AND func=:funcName AND name=:objectName",
-                    {
-                        "fileName": fileName,
-                        "funcName": funcName,
-                        "objectName": objectName,
-                    },
-                )
-                values = [v[0] for v in list(selection)]
-                print(
-                    f"file: {fileName}; func: {funcName}; object: {objectName}; {values}"
-                )
-                if values != []:
-                    funcValues.append(np.mean(values))
-            if funcValues != []:
-                plotValues[funcName] = funcValues
-        if self.normBox.isChecked():
-            plotValues = self._normalize(plotValues)
-        print(plotValues)
-        for key, value in plotValues.items():
-            self.plot.axes.bar(fileNames, value, 0.35, label=key, bottom=base)
-            base = value
-        self.plot.axes.legend()
-        self.mainLayout.addWidget(self.plot)
+        if objectName != "":
+            self.plot.axes.clear()
+            selection = self.dbCursor.execute(
+                "SELECT DISTINCT func FROM datasets WHERE func!='step'"
+            )
+            funcNames = [v[0] for v in list(selection)]
+            for funcName in funcNames:
+                funcValues = list()
+                for fileName in fileNames:
+                    selection = self.dbCursor.execute(
+                        "SELECT mean FROM datasets WHERE file=:fileName AND func=:funcName AND name=:objectName",
+                        {
+                            "fileName": fileName,
+                            "funcName": funcName,
+                            "objectName": objectName,
+                        },
+                    )
+                    values = [v[0] for v in list(selection)]
+                    print(
+                        f"file: {fileName}; func: {funcName}; object: {objectName}; {values}"
+                    )
+                    if values != []:
+                        funcValues.append(np.mean(values))
+                if funcValues != []:
+                    plotValues[funcName] = funcValues
+            if self.normBox.isChecked():
+                plotValues = self._normalize(plotValues)
+            print(plotValues)
+            for key, value in plotValues.items():
+                self.plot.axes.bar(fileNames, value, 0.35, label=key, bottom=base)
+                base = value
+            self.plot.axes.legend()
+            self.plot.draw()
         self.tree.blockSignals(False)
 
     def _normalize(self, data):
