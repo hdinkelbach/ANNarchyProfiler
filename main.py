@@ -26,6 +26,7 @@
 import sys
 
 from PyQt5 import QtWidgets
+
 from ANNarchyProfiler import ANNarchyProfiler
 
 """
