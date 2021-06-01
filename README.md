@@ -15,3 +15,13 @@ The tool serves as an offline analysis tool to determine the fraction of time re
 
 * either by the profiler itself via the Start -> Run measurement dialog
 * on command line: python YourScript.py --profile
+
+## TODO
+ - [X] reloading data
+ - [X] calculate bottom of bars as sum of previos bars
+ - [X] calculate overhead as step - sum(operations)
+ - [X] log mode for y axis
+ - [X] y label (computation time per step [ms] or computation time per step [ms, log-scale] or percentage)
+ - [ ] missing values = 0.0
+ - [X] summary for population
+ - [X] plot all mean values as line plot (spikes are standard deviation)
