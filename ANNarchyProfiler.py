@@ -23,6 +23,11 @@
 #
 # ==============================================================================
 
+from PyQt5.QtGui import QIcon
+from PyQt5.Qt import Qt
+from PyQt5 import QtCore, QtWidgets
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 import marshal
 import pathlib
 import random
@@ -34,11 +39,6 @@ import matplotlib
 import numpy as np
 
 matplotlib.use("Qt5Agg")
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from matplotlib.figure import Figure
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.Qt import Qt
-from PyQt5.QtGui import QIcon
 
 
 class PlotCanvas(FigureCanvasQTAgg):
@@ -60,6 +60,7 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
         self.statusBar().showMessage("Initializing")
         self.setGeometry(300, 300, 600, 400)
         self.setWindowTitle("ANNarchy Profiler")
+        self.showMaximized()
 
         # Setup the menu bar
         menubar = self.menuBar()
@@ -88,6 +89,8 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
         self.toolbar = self.addToolBar("Tool Bar")
         self.normBox = QtWidgets.QCheckBox("Normalize bars")
         self.toolbar.addWidget(self.normBox)
+        self.logBox = QtWidgets.QCheckBox("Logarithmic scale")
+        self.toolbar.addWidget(self.logBox)
 
         # the widget to hold the application content
         self.mainWidget = QtWidgets.QWidget()
@@ -193,6 +196,7 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
                         data[i.tag] = i.text
                     # insert dataset into database (not existing data will be None)
                     # the "raw_data" property is stored as a byte text serialized with marshal
+                    data["raw_data"] = list(map(float, data["raw_data"].split()))
                     self.dbCursor.execute(
                         "INSERT INTO datasets (file, paradigm, num_threads, obj_type, name, func, label, mean, std, raw_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         [
@@ -212,26 +216,36 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
                     self.dbConnection.commit()
         # set the tree parent item to be checked by default to avoid check state inconsistencies
         self.filesParent.setCheckState(0, Qt.Checked)
+        # TODO: clean database entries (insert missing datasets) (SELECT ... EXCEPT SELECT ...)
         # select all the distinct object types from the database to create a property selection
-        objectTypes = self.dbCursor.execute("SELECT DISTINCT obj_type FROM datasets")
-        for objectType in objectTypes.fetchall():
+        selection = self.dbCursor.execute("SELECT DISTINCT obj_type FROM datasets")
+        objectTypes = list(selection)
+        for objectType in objectTypes:
             # create a tree item
             item = QtWidgets.QTreeWidgetItem(self.objectsParent)
             # set text of the tree item to the object type
             item.setText(0, objectType[0])
             # select distinct object names for every object type
-            itemNames = self.dbCursor.execute(
-                "SELECT DISTINCT name FROM datasets WHERE obj_type=:objectName",
-                {"objectName": objectType[0]},
-            )
+            if objectType[0] == "net":
+                selection = self.dbCursor.execute(
+                    "SELECT DISTINCT func FROM datasets WHERE obj_type=:objectName",
+                    {"objectName": objectType[0]},
+                )
+            else:
+                selection = self.dbCursor.execute(
+                    "SELECT DISTINCT name FROM datasets WHERE obj_type=:objectName",
+                    {"objectName": objectType[0]},
+                )
+            itemNames = list(selection)
             # add the objects as child of thier object type
-            for itemName in itemNames.fetchall():
+            for itemName in itemNames:
                 subItem = QtWidgets.QTreeWidgetItem(item)
                 subItem.setText(0, itemName[0])
         # connect change actions to the drawing function
         self.tree.itemChanged.connect(self.redrawPlot)
         self.tree.itemSelectionChanged.connect(self.redrawPlot)
         self.normBox.stateChanged.connect(self.redrawPlot)
+        self.logBox.stateChanged.connect(self.redrawPlot)
 
     def exportFiles(self):
         raise NotImplementedError("This function is not implemented yet")
@@ -243,6 +257,7 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
         objectName = str()
         base = list()
         plotValues = dict()
+        label = "computation time per step [ms"
         print("Redraw the plot")
         # find all checked data sources by iterating through the structure
         for i in range(self.filesParent.childCount()):
@@ -269,14 +284,33 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
             self.plot.axes.clear()
             for fileName in fileNames:
                 # fetch values from database
-                if objectName == "network":
+                if objectName == "net":
                     selection = self.dbCursor.execute(
-                        "SELECT func, AVG(mean) FROM datasets WHERE file=:fileName AND name=:objectName AND func!='step' GROUP BY func ORDER BY func",
+                        "SELECT func, AVG(mean) FROM datasets WHERE file=:fileName AND obj_type=:objectName AND func!='step' GROUP BY func ORDER BY func",
                         {"fileName": fileName, "objectName": objectName},
                     )
                 elif objectName == "proj":
                     selection = self.dbCursor.execute(
                         "SELECT name, AVG(mean) FROM datasets WHERE file=:fileName AND obj_type=:objectName GROUP BY name ORDER BY name",
+                        {"fileName": fileName, "objectName": objectName},
+                    )
+                elif objectName == "pop":
+                    selection = self.dbCursor.execute(
+                        "SELECT name, AVG(mean) FROM datasets WHERE file=:fileName AND obj_type=:objectName GROUP BY name ORDER BY name",
+                        {"fileName": fileName, "objectName": objectName},
+                    )
+                # FIXME: is there a more flexible way to build this list?
+                elif objectName in [
+                    "global_op",
+                    "neur_step",
+                    "proj_step",
+                    "psp",
+                    "record",
+                    "rng",
+                    "step",
+                ]:
+                    selection = self.dbCursor.execute(
+                        "SELECT func, raw_data FROM datasets WHERE file=:fileName AND func=:objectName",
                         {"fileName": fileName, "objectName": objectName},
                     )
                 else:
@@ -287,11 +321,22 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
                 # gather fetched values in dict to plot them later
                 funcValues = list(selection)
                 plotValues["func"] = [i for i, _ in funcValues]
-                plotValues[fileName] = [i for _, i in funcValues]
+                if objectName in [
+                    "global_op",
+                    "neur_step",
+                    "proj_step",
+                    "psp",
+                    "record",
+                    "rng",
+                    "step",
+                ]:
+                    plotValues[fileName] = [marshal.loads(i) for _, i in funcValues]
+                else:
+                    plotValues[fileName] = [i for _, i in funcValues]
                 # calculate overhead (this is only neccessary for the whole network)
-                if objectName == "network":
+                if objectName == "net":
                     selection = self.dbCursor.execute(
-                        "SELECT func, AVG(mean) FROM datasets WHERE file=:fileName AND name=:objectName AND func='step' GROUP BY func ORDER BY func",
+                        "SELECT func, AVG(mean) FROM datasets WHERE file=:fileName AND obj_type=:objectName AND func='step' GROUP BY func ORDER BY func",
                         {"fileName": fileName, "objectName": objectName},
                     )
                     funcValues = list(selection)
@@ -300,17 +345,47 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
                     plotValues[fileName].append(
                         funcValues[0][1] - sum(plotValues[fileName])
                     )
-            # if the normalization box is checked normalize the values
-            if self.normBox.isChecked():
-                plotValues = self._normalize(plotValues)
-            print(plotValues)
-            # plot the values as stacked bar chart
-            # the bottom parameter starts out as a list of zeros and will grow with every plotted value
-            for key, *value in zip(*(list(plotValues.values()))):
-                self.plot.axes.bar(fileNames, value, 0.35, label=key, bottom=base)
-                base = [i + j for i, j in zip(value, base)]
+            if objectName in [
+                "global_op",
+                "neur_step",
+                "proj_step",
+                "psp",
+                "record",
+                "rng",
+                "step",
+            ]:
+                for key, value in plotValues.items():
+                    print(key, len(value))
+                    if key == "func":
+                        plotValues[key] = plotValues[key][0]
+                    else:
+                        plotValues[key] = [np.mean(i) for i in zip(*(plotValues[key]))]
+                    print(key, len(plotValues[key]))
+                for key, value in plotValues.items():
+                    if key != "func":
+                        self.plot.axes.plot(value, label=key)
+                label += "]"
+            else:
+                # if the normalization box is checked normalize the values
+                if self.normBox.isChecked():
+                    plotValues = self._normalize(plotValues)
+                    label = "parts [percentages"
+                print(plotValues)
+                # if the logarithmic scale box is checked set y scale to log
+                if self.logBox.isChecked():
+                    self.plot.axes.set_yscale("log")
+                    label += ", log-scale]"
+                else:
+                    label += "]"
+                # plot the values as stacked bar chart
+                # the bottom parameter starts out as a list of zeros and will grow with every plotted value
+                for key, *value in zip(*(list(plotValues.values()))):
+                    self.plot.axes.bar(fileNames, value, 0.35, label=key, bottom=base)
+                    base = [i + j for i, j in zip(value, base)]
             # plot a legend
             self.plot.axes.legend()
+            # set the y label
+            self.plot.axes.set_ylabel(label)
             # draw the plot to the canvas
             self.plot.draw()
         # release the signal blockade
