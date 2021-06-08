@@ -25,3 +25,9 @@ The tool serves as an offline analysis tool to determine the fraction of time re
  - [ ] missing values = 0.0
  - [X] summary for population
  - [X] plot all mean values as line plot (spikes are standard deviation)
+ - [ ] line plot with log scale and normalized
+ - [ ] mutual exclusion normalisation and log scale
+ - [X] check box speed up (single thread / multi thread)
+ - [X] grid for line plots
+ - [X] Save function for current plot
+ - [X] x label (number of measurements)

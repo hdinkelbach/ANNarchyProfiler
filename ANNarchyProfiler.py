@@ -44,9 +44,9 @@ matplotlib.use("Qt5Agg")
 class PlotCanvas(FigureCanvasQTAgg):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         self.parent = parent
-        fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot(1, 1, 1)
-        super(PlotCanvas, self).__init__(fig)
+        self.fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = self.fig.add_subplot(1, 1, 1)
+        super(PlotCanvas, self).__init__(self.fig)
 
 
 class ANNarchyProfiler(QtWidgets.QMainWindow):
@@ -72,6 +72,12 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
         openAction.setStatusTip("Open files")
         openAction.triggered.connect(self.openFiles)
         fileMenu.addAction(openAction)
+        # Add save action
+        saveAction = QtWidgets.QAction(QIcon("save.png"), "&Save", self)
+        saveAction.setShortcut("Ctrl+S")
+        saveAction.setStatusTip("Save Plot")
+        saveAction.triggered.connect(self.savePlot)
+        fileMenu.addAction(saveAction)
         # Add export action
         exportAction = QtWidgets.QAction(QIcon("export.png"), "&Export", self)
         exportAction.setShortcut("Ctrl+E")
@@ -83,6 +89,7 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
         exitAction.setShortcut("Ctrl+Q")
         exitAction.setStatusTip("Exit ANNarchy Profiler")
         exitAction.triggered.connect(QtWidgets.qApp.quit)
+        fileMenu.addSeparator()
         fileMenu.addAction(exitAction)
 
         # Setup the tool bar
@@ -91,6 +98,9 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
         self.toolbar.addWidget(self.normBox)
         self.logBox = QtWidgets.QCheckBox("Logarithmic scale")
         self.toolbar.addWidget(self.logBox)
+        self.speedUpBox = QtWidgets.QCheckBox("Speed Up")
+        self.toolbar.addSeparator()
+        self.toolbar.addWidget(self.speedUpBox)
 
         # the widget to hold the application content
         self.mainWidget = QtWidgets.QWidget()
@@ -246,9 +256,24 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
         self.tree.itemSelectionChanged.connect(self.redrawPlot)
         self.normBox.stateChanged.connect(self.redrawPlot)
         self.logBox.stateChanged.connect(self.redrawPlot)
+        self.speedUpBox.stateChanged.connect(self.redrawPlot)
 
     def exportFiles(self):
         raise NotImplementedError("This function is not implemented yet")
+
+    def savePlot(self):
+        # get options for a file dialog to contol behavior and appearance
+        options = QtWidgets.QFileDialog.Options()
+        # get path and name of the file to save the plot into
+        file_name, file_format = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            "Save Plot",
+            "",
+            "PNG Image (*.png);;JPG Image (*.jpg);;All files (*)",
+            options=options,
+        )
+        print(file_name, file_format)
+        self.plot.fig.savefig(file_name, format=file_format.split(".")[-1][:-1])
 
     def redrawPlot(self):
         # block all signals emitted by the item tree to prevent strange behavior
@@ -354,6 +379,7 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
                 "rng",
                 "step",
             ]:
+                self.plot.axes.grid(True, which="both", axis="both")
                 for key, value in plotValues.items():
                     print(key, len(value))
                     if key == "func":
@@ -361,11 +387,25 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
                     else:
                         plotValues[key] = [np.mean(i) for i in zip(*(plotValues[key]))]
                     print(key, len(plotValues[key]))
+                if self.speedUpBox.isChecked():
+                    base = list(plotValues.items())[1][1].copy()
+                    for key, value in plotValues.items():
+                        if key != "func":
+                            curr = plotValues[key]
+                            print("base", type(base), base[0])
+                            print("curr", type(curr), curr[0])
+                            for i in range(len(plotValues[key])):
+                                plotValues[key][i] = base[i] / curr[i]
+                    label = "computation time per step [speed up]"
+                else:
+                    label += "]"
                 for key, value in plotValues.items():
                     if key != "func":
                         self.plot.axes.plot(value, label=key)
-                label += "]"
+
+                self.plot.axes.set_xlabel("Number of Measurements")
             else:
+                self.plot.axes.grid(True, which="both", axis="y")
                 # if the normalization box is checked normalize the values
                 if self.normBox.isChecked():
                     plotValues = self._normalize(plotValues)
