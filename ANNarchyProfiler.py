@@ -402,6 +402,8 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
                 for key, value in plotValues.items():
                     if key != "func":
                         self.plot.axes.plot(value, label=key)
+                if self.logBox.isChecked():
+                    self.plot.axes.set_yscale("log")
 
                 self.plot.axes.set_xlabel("Number of Measurements")
             else:
