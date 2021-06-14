@@ -94,12 +94,23 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
 
         # Setup the tool bar
         self.toolbar = self.addToolBar("Tool Bar")
-        self.normBox = QtWidgets.QCheckBox("Normalize bars")
-        self.toolbar.addWidget(self.normBox)
-        self.logBox = QtWidgets.QCheckBox("Logarithmic scale")
-        self.toolbar.addWidget(self.logBox)
-        self.speedUpBox = QtWidgets.QCheckBox("Speed Up")
+        self.axisStyleGroub = QtWidgets.QButtonGroup(self.toolbar)
+        # Add basic option to button group
+        self.basicStyleButton = QtWidgets.QRadioButton("Basic")
+        self.basicStyleButton.setChecked(True)
+        self.axisStyleGroub.addButton(self.basicStyleButton)
+        self.toolbar.addWidget(self.basicStyleButton)
+        # Add normalization option to button group
+        self.normalizedStyleButton = QtWidgets.QRadioButton("Normalize bars")
+        self.axisStyleGroub.addButton(self.normalizedStyleButton)
+        self.toolbar.addWidget(self.normalizedStyleButton)
+        # Add logarithmic option to button group
+        self.logarithmicStyleButton = QtWidgets.QRadioButton("Logarithmic scale")
+        self.axisStyleGroub.addButton(self.logarithmicStyleButton)
+        self.toolbar.addWidget(self.logarithmicStyleButton)
+        # Add speed up option
         self.toolbar.addSeparator()
+        self.speedUpBox = QtWidgets.QCheckBox("Speed up")
         self.toolbar.addWidget(self.speedUpBox)
 
         # the widget to hold the application content
@@ -254,8 +265,9 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
         # connect change actions to the drawing function
         self.tree.itemChanged.connect(self.redrawPlot)
         self.tree.itemSelectionChanged.connect(self.redrawPlot)
-        self.normBox.stateChanged.connect(self.redrawPlot)
-        self.logBox.stateChanged.connect(self.redrawPlot)
+        self.basicStyleButton.toggled.connect(self.redrawPlot)
+        self.normalizedStyleButton.toggled.connect(self.redrawPlot)
+        self.logarithmicStyleButton.toggled.connect(self.redrawPlot)
         self.speedUpBox.stateChanged.connect(self.redrawPlot)
 
     def exportFiles(self):
@@ -402,19 +414,19 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
                 for key, value in plotValues.items():
                     if key != "func":
                         self.plot.axes.plot(value, label=key)
-                if self.logBox.isChecked():
+                if self.logarithmicStyleButton.isChecked():
                     self.plot.axes.set_yscale("log")
 
                 self.plot.axes.set_xlabel("Number of Measurements")
             else:
                 self.plot.axes.grid(True, which="both", axis="y")
                 # if the normalization box is checked normalize the values
-                if self.normBox.isChecked():
+                if self.normalizedStyleButton.isChecked():
                     plotValues = self._normalize(plotValues)
                     label = "parts [percentages"
                 print(plotValues)
                 # if the logarithmic scale box is checked set y scale to log
-                if self.logBox.isChecked():
+                if self.logarithmicStyleButton.isChecked():
                     self.plot.axes.set_yscale("log")
                     label += ", log-scale]"
                 else:
