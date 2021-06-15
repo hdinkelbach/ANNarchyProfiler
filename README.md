@@ -31,5 +31,5 @@ The tool serves as an offline analysis tool to determine the fraction of time re
  - [X] grid for line plots
  - [X] Save function for current plot
  - [X] x label (number of measurements)
- - [ ] calculate speed up based on mean values
- - [ ] raw data plot
+ - [X] calculate speed up based on mean values
+ - [X] raw data plot

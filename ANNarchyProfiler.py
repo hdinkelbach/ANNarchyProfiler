@@ -94,24 +94,37 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
 
         # Setup the tool bar
         self.toolbar = self.addToolBar("Tool Bar")
+        # Add axis style button group
         self.axisStyleGroub = QtWidgets.QButtonGroup(self.toolbar)
         # Add basic option to button group
-        self.basicStyleButton = QtWidgets.QRadioButton("Basic")
-        self.basicStyleButton.setChecked(True)
-        self.axisStyleGroub.addButton(self.basicStyleButton)
-        self.toolbar.addWidget(self.basicStyleButton)
+        self.basicAxisStyleButton = QtWidgets.QRadioButton("Basic")
+        self.basicAxisStyleButton.setChecked(True)
+        self.axisStyleGroub.addButton(self.basicAxisStyleButton)
+        self.toolbar.addWidget(self.basicAxisStyleButton)
         # Add normalization option to button group
-        self.normalizedStyleButton = QtWidgets.QRadioButton("Normalize bars")
-        self.axisStyleGroub.addButton(self.normalizedStyleButton)
-        self.toolbar.addWidget(self.normalizedStyleButton)
+        self.normalizedAxisStyleButton = QtWidgets.QRadioButton("Normalize bars")
+        self.axisStyleGroub.addButton(self.normalizedAxisStyleButton)
+        self.toolbar.addWidget(self.normalizedAxisStyleButton)
         # Add logarithmic option to button group
-        self.logarithmicStyleButton = QtWidgets.QRadioButton("Logarithmic scale")
-        self.axisStyleGroub.addButton(self.logarithmicStyleButton)
-        self.toolbar.addWidget(self.logarithmicStyleButton)
-        # Add speed up option
+        self.logarithmicAxisStyleButton = QtWidgets.QRadioButton("Logarithmic scale")
+        self.axisStyleGroub.addButton(self.logarithmicAxisStyleButton)
+        self.toolbar.addWidget(self.logarithmicAxisStyleButton)
         self.toolbar.addSeparator()
-        self.speedUpBox = QtWidgets.QCheckBox("Speed up")
-        self.toolbar.addWidget(self.speedUpBox)
+        # Add line plot style button group
+        self.plotStyleGroup = QtWidgets.QButtonGroup(self.toolbar)
+        # Add basic option to button group
+        self.basicPlotStyleButton = QtWidgets.QRadioButton("Basic")
+        self.basicPlotStyleButton.setChecked(True)
+        self.plotStyleGroup.addButton(self.basicPlotStyleButton)
+        self.toolbar.addWidget(self.basicPlotStyleButton)
+        # Add speed up option to button group
+        self.speedUpPlotStyleButton = QtWidgets.QRadioButton("Speed up")
+        self.plotStyleGroup.addButton(self.speedUpPlotStyleButton)
+        self.toolbar.addWidget(self.speedUpPlotStyleButton)
+        # Add raw data option to button group
+        self.rawDataPlotStyleButton = QtWidgets.QRadioButton("Raw data")
+        self.plotStyleGroup.addButton(self.rawDataPlotStyleButton)
+        self.toolbar.addWidget(self.rawDataPlotStyleButton)
 
         # the widget to hold the application content
         self.mainWidget = QtWidgets.QWidget()
@@ -265,10 +278,12 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
         # connect change actions to the drawing function
         self.tree.itemChanged.connect(self.redrawPlot)
         self.tree.itemSelectionChanged.connect(self.redrawPlot)
-        self.basicStyleButton.toggled.connect(self.redrawPlot)
-        self.normalizedStyleButton.toggled.connect(self.redrawPlot)
-        self.logarithmicStyleButton.toggled.connect(self.redrawPlot)
-        self.speedUpBox.stateChanged.connect(self.redrawPlot)
+        self.basicAxisStyleButton.toggled.connect(self.redrawPlot)
+        self.normalizedAxisStyleButton.toggled.connect(self.redrawPlot)
+        self.logarithmicAxisStyleButton.toggled.connect(self.redrawPlot)
+        self.basicPlotStyleButton.toggled.connect(self.redrawPlot)
+        self.speedUpPlotStyleButton.toggled.connect(self.redrawPlot)
+        self.rawDataPlotStyleButton.toggled.connect(self.redrawPlot)
 
     def exportFiles(self):
         raise NotImplementedError("This function is not implemented yet")
@@ -337,17 +352,39 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
                         {"fileName": fileName, "objectName": objectName},
                     )
                 # FIXME: is there a more flexible way to build this list?
-                elif objectName in [
-                    "global_op",
-                    "neur_step",
-                    "proj_step",
-                    "psp",
-                    "record",
-                    "rng",
-                    "step",
-                ]:
+                elif (
+                    objectName
+                    in [
+                        "global_op",
+                        "neur_step",
+                        "proj_step",
+                        "psp",
+                        "record",
+                        "rng",
+                        "step",
+                    ]
+                    and self.rawDataPlotStyleButton.isChecked()
+                ):
                     selection = self.dbCursor.execute(
                         "SELECT func, raw_data FROM datasets WHERE file=:fileName AND func=:objectName",
+                        {"fileName": fileName, "objectName": objectName},
+                    )
+                # FIXME: is there a more flexible way to build this list?
+                elif (
+                    objectName
+                    in [
+                        "global_op",
+                        "neur_step",
+                        "proj_step",
+                        "psp",
+                        "record",
+                        "rng",
+                        "step",
+                    ]
+                    and not self.rawDataPlotStyleButton.isChecked()
+                ):
+                    selection = self.dbCursor.execute(
+                        "SELECT func, mean FROM datasets WHERE file=:fileName AND func=:objectName",
                         {"fileName": fileName, "objectName": objectName},
                     )
                 else:
@@ -358,15 +395,19 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
                 # gather fetched values in dict to plot them later
                 funcValues = list(selection)
                 plotValues["func"] = [i for i, _ in funcValues]
-                if objectName in [
-                    "global_op",
-                    "neur_step",
-                    "proj_step",
-                    "psp",
-                    "record",
-                    "rng",
-                    "step",
-                ]:
+                if (
+                    objectName
+                    in [
+                        "global_op",
+                        "neur_step",
+                        "proj_step",
+                        "psp",
+                        "record",
+                        "rng",
+                        "step",
+                    ]
+                    and self.rawDataPlotStyleButton.isChecked()
+                ):
                     plotValues[fileName] = [marshal.loads(i) for _, i in funcValues]
                 else:
                     plotValues[fileName] = [i for _, i in funcValues]
@@ -396,10 +437,13 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
                     print(key, len(value))
                     if key == "func":
                         plotValues[key] = plotValues[key][0]
-                    else:
+                    elif key != "func" and self.rawDataPlotStyleButton.isChecked():
                         plotValues[key] = [np.mean(i) for i in zip(*(plotValues[key]))]
-                    print(key, len(plotValues[key]))
-                if self.speedUpBox.isChecked():
+                        print(key, len(plotValues[key]))
+                    else:
+                        plotValues[key] = plotValues[key]
+                print(plotValues)
+                if self.speedUpPlotStyleButton.isChecked():
                     base = list(plotValues.items())[1][1].copy()
                     for key, value in plotValues.items():
                         if key != "func":
@@ -414,19 +458,19 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
                 for key, value in plotValues.items():
                     if key != "func":
                         self.plot.axes.plot(value, label=key)
-                if self.logarithmicStyleButton.isChecked():
+                if self.logarithmicAxisStyleButton.isChecked():
                     self.plot.axes.set_yscale("log")
 
                 self.plot.axes.set_xlabel("Number of Measurements")
             else:
                 self.plot.axes.grid(True, which="both", axis="y")
                 # if the normalization box is checked normalize the values
-                if self.normalizedStyleButton.isChecked():
+                if self.normalizedAxisStyleButton.isChecked():
                     plotValues = self._normalize(plotValues)
                     label = "parts [percentages"
                 print(plotValues)
                 # if the logarithmic scale box is checked set y scale to log
-                if self.logarithmicStyleButton.isChecked():
+                if self.logarithmicAxisStyleButton.isChecked():
                     self.plot.axes.set_yscale("log")
                     label += ", log-scale]"
                 else:
