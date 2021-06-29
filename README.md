@@ -33,3 +33,4 @@ The tool serves as an offline analysis tool to determine the fraction of time re
  - [X] x label (number of measurements)
  - [X] calculate speed up based on mean values
  - [X] raw data plot
+ - [X] extend raw data to one list and plot slice

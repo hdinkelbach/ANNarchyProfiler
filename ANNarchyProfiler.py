@@ -125,6 +125,23 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
         self.rawDataPlotStyleButton = QtWidgets.QRadioButton("Raw data")
         self.plotStyleGroup.addButton(self.rawDataPlotStyleButton)
         self.toolbar.addWidget(self.rawDataPlotStyleButton)
+        # Add minimum as lower bound for raw data slice
+        self.minLabel = QtWidgets.QLabel("Min:")
+        self.toolbar.addWidget(self.minLabel)
+        self.minBox = QtWidgets.QSpinBox()
+        # self.minBox.setEnabled(False)
+        # self.minBox.setRange(0, 100)
+        self.minBox.setMinimum(0)
+        self.toolbar.addWidget(self.minBox)
+        # Add maximum as upper bound for raw data slice
+        self.maxLabel = QtWidgets.QLabel("Max:")
+        self.toolbar.addWidget(self.maxLabel)
+        self.maxBox = QtWidgets.QSpinBox()
+        # self.maxBox.setEnabled(False)
+        # self.maxBox.setRange(0, 100)
+        self.maxBox.setMinimum(0)
+        self.maxBox.setValue(2)
+        self.toolbar.addWidget(self.maxBox)
 
         # the widget to hold the application content
         self.mainWidget = QtWidgets.QWidget()
@@ -284,6 +301,8 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
         self.basicPlotStyleButton.toggled.connect(self.redrawPlot)
         self.speedUpPlotStyleButton.toggled.connect(self.redrawPlot)
         self.rawDataPlotStyleButton.toggled.connect(self.redrawPlot)
+        self.minBox.valueChanged.connect(self.redrawPlot)
+        self.maxBox.valueChanged.connect(self.redrawPlot)
 
     def exportFiles(self):
         raise NotImplementedError("This function is not implemented yet")
@@ -438,11 +457,18 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
                     if key == "func":
                         plotValues[key] = plotValues[key][0]
                     elif key != "func" and self.rawDataPlotStyleButton.isChecked():
-                        plotValues[key] = [np.mean(i) for i in zip(*(plotValues[key]))]
+                        [plotValues[key][0].extend(x) for x in plotValues[key][1:]]
+                        plotValues[key] = plotValues[key][0]
+                        # plotValues[key] = [np.mean(i) for i in zip(*(plotValues[key]))]
+                        self.minBox.setMaximum(
+                            max(len(plotValues[key]), self.minBox.maximum())
+                        )
+                        self.maxBox.setMaximum(
+                            max(len(plotValues[key]), self.maxBox.maximum())
+                        )
                         print(key, len(plotValues[key]))
                     else:
                         plotValues[key] = plotValues[key]
-                print(plotValues)
                 if self.speedUpPlotStyleButton.isChecked():
                     base = list(plotValues.items())[1][1].copy()
                     for key, value in plotValues.items():
@@ -457,7 +483,14 @@ class ANNarchyProfiler(QtWidgets.QMainWindow):
                     label += "]"
                 for key, value in plotValues.items():
                     if key != "func":
-                        self.plot.axes.plot(value, label=key)
+                        if self.rawDataPlotStyleButton.isChecked():
+                            self.plot.axes.plot(
+                                range(self.minBox.value(), self.maxBox.value() + 1),
+                                value[self.minBox.value() : self.maxBox.value() + 1],
+                                label=key,
+                            )
+                        else:
+                            self.plot.axes.plot(value, label=key)
                 if self.logarithmicAxisStyleButton.isChecked():
                     self.plot.axes.set_yscale("log")
 
